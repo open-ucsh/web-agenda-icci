@@ -1,23 +1,24 @@
-import { CalendarDays } from "lucide-react";
+import { useState } from "react";
+
+import { type AcademicPeriod, Navbar } from "@/components/Navbar";
+
+const PERIODS: readonly AcademicPeriod[] = [
+  {
+    id: "2026-2",
+    label: "2026 · Segundo semestre",
+  },
+];
 
 export default function App() {
+  const [selectedPeriod, setSelectedPeriod] = useState("2026-2");
+
   return (
     <div className="min-h-dvh bg-background text-text">
-      <header className="border-b border-border">
-        <div className="mx-auto flex h-16 max-w-screen-2xl items-center gap-3 px-4 sm:px-6">
-          <CalendarDays aria-hidden="true" className="size-6 text-brand" />
-
-          <span className="text-lg font-semibold tracking-tight">Agenda ICCI</span>
-
-          <span className="hidden text-sm text-muted sm:inline">por Open UCSH</span>
-        </div>
-      </header>
-
-      <main className="mx-auto max-w-screen-2xl px-4 py-8 sm:px-6">
-        <h1 className="text-xl font-semibold tracking-tight">Apoyo académico</h1>
-
-        <p className="mt-2 text-sm text-muted">Mentorías PACE, mentorías y ayudantías de ICCI.</p>
-      </main>
+      <Navbar
+        onPeriodChange={setSelectedPeriod}
+        periods={PERIODS}
+        selectedPeriod={selectedPeriod}
+      />
     </div>
   );
 }
