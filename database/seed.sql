@@ -1,18 +1,6 @@
-INSERT INTO academic_periods (
-    id, name, timezone, semester_end
-)
-VALUES (
-    '2026-2',
-    '2026 · Segundo semestre',
-    'America/Santiago',
-    '2026-12-19'
-);
-
+-- Talleres publicados desde el 20 de octubre.
+-- Ubicaciones pendientes de confirmar.
 -- Lunes = 1, domingo = 7.
--- Publicamos los apoyos desde el 19 de octubre:
--- no conocemos su fecha original de inicio.
--- La vigencia hasta el 19 de diciembre fue indicada por el usuario.
--- Las ubicaciones quedan pendientes de confirmar.
 
 INSERT INTO weekly_activities (
     id, period_id, name, type, weekday,
@@ -22,79 +10,87 @@ INSERT INTO weekly_activities (
 )
 VALUES
     (
-        'pace-general-1', '2026-2', 'Apoyo general PACE', 'pace', 2,
-        '10:30', '11:30',
-        'Fabián Suárez', 'student', 'Sala de estudio N.º 7 · Casa Central',
-        '2026-10-19', '2026-12-19'
+        'workshop-yoga', '2026-2',
+        'Modo zen · Yoga', 'workshop', 2,
+        '11:30', '12:50',
+        'Mariela Mahias', 'facilitator', NULL,
+        '2026-10-20', '2026-12-19'
     ),
     (
-        'pace-general-2', '2026-2', 'Apoyo general PACE', 'pace', 2,
+        'workshop-tenis-mesa', '2026-2',
+        'Entre mesas y paletas · Tenis de mesa', 'workshop', 2,
+        '13:00', '15:00',
+        'Jaime Araya', 'facilitator', NULL,
+        '2026-10-20', '2026-12-19'
+    ),
+    (
+        'workshop-arte-urbano', '2026-2',
+        'Arte sin muros · Arte urbano', 'workshop', 2,
+        '18:00', '19:00',
+        'Camila Espina', 'facilitator', NULL,
+        '2026-10-20', '2026-12-19'
+    ),
+    (
+        'workshop-defensa-personal', '2026-2',
+        'Modo ninja · Defensa personal', 'workshop', 3,
+        '13:00', '14:20',
+        'José Bernales', 'facilitator', NULL,
+        '2026-10-20', '2026-12-19'
+    ),
+    (
+        'workshop-danza-urbana', '2026-2',
+        'Flow en la pista · Danza urbana', 'workshop', 3,
+        '15:20', '16:40',
+        'Francisca Carraco', 'facilitator', NULL,
+        '2026-10-20', '2026-12-19'
+    ),
+    (
+        'workshop-basquetbol', '2026-2',
+        'De rebote al aro · Básquetbol', 'workshop', 3,
+        '15:20', '16:50',
+        'Bárbara Araya', 'facilitator', NULL,
+        '2026-10-20', '2026-12-19'
+    ),
+    (
+        'workshop-voleibol', '2026-2',
+        'Que no toque el suelo · Voleibol', 'workshop', 3,
+        '16:50', '18:10',
+        'Club Vive Voller', 'facilitator', NULL,
+        '2026-10-20', '2026-12-19'
+    ),
+    (
+        'workshop-natacion', '2026-2',
+        'Sálvese quien nade · Natación', 'workshop', 4,
+        '11:30', '12:50',
+        'Andrés Ferreira', 'facilitator', NULL,
+        '2026-10-20', '2026-12-19'
+    ),
+    (
+        'workshop-amigurumi', '2026-2',
+        'Punto a punto · Amigurumi', 'workshop', 4,
         '11:30', '12:30',
-        'Fabián Suárez', 'student', 'Sala de estudio N.º 7 · Casa Central',
-        '2026-10-19', '2026-12-19'
+        'María José Osorio', 'facilitator', NULL,
+        '2026-10-20', '2026-12-19'
     ),
     (
-        'mentoring-calculo', '2026-2', 'Cálculo I', 'mentoring', 3,
-        '10:00', '11:00',
-        'Felipe Vega', 'professor', 'Sala D02 · Casa Central',
-        '2026-10-19', '2026-12-19'
+        'workshop-voz', '2026-2',
+        'Do re mi fa sol la siii · Uso de la voz', 'workshop', 4,
+        '13:00', '14:20',
+        'Nirvana Sotomayor', 'facilitator', NULL,
+        '2026-10-20', '2026-12-19'
     ),
     (
-        'mentoring-fisica', '2026-2', 'Física', 'mentoring', 1,
-        '15:00', '16:00',
-        'Oliver Rodríguez', 'professor', 'Edificio PACE · 4.º piso',
-        '2026-10-19', '2026-12-19'
-    );
-
-INSERT INTO academic_dates (
-    id, period_id, title, starts_on, ends_on, featured, source
-)
-VALUES
-    (
-        'career-change-2027-1', '2026-2',
-        'Plazo para solicitar cambio de carrera',
-        '2026-10-30', '2026-10-30', 0,
-        'Calendario académico UCSH 2026 proporcionado por el usuario'
+        'workshop-danza-arabe', '2026-2',
+        'Entre velos y movimientos · Danza árabe', 'workshop', 4,
+        '14:20', '15:20',
+        'Constanza Neira', 'facilitator', NULL,
+        '2026-10-20', '2026-12-19'
     ),
     (
-        'withdrawal-2026-2', '2026-2',
-        'Plazo para solicitar retiro temporal o definitivo',
-        '2026-11-13', '2026-11-13', 0,
-        'Calendario académico UCSH 2026 proporcionado por el usuario'
-    ),
-    (
-        'integrative-assessments-2026-2', '2026-2',
-        'Evaluaciones integrativas',
-        '2026-11-23', '2026-12-05', 1,
-        'Calendario académico UCSH 2026 proporcionado por el usuario'
-    ),
-    (
-        'teaching-survey-2026-2', '2026-2',
-        'Encuesta docente',
-        '2026-11-23', '2026-12-12', 0,
-        'Calendario académico UCSH 2026 proporcionado por el usuario'
-    ),
-    (
-        'course-offering-2027-1', '2026-2',
-        'Publicación de oferta académica 2027/1',
-        '2026-12-09', '2026-12-09', 0,
-        'Calendario académico UCSH 2026 proporcionado por el usuario'
-    ),
-    (
-        'semester-end-2026-2', '2026-2',
-        'Término del segundo semestre',
-        '2026-12-19', '2026-12-19', 1,
-        'Calendario académico UCSH 2026 proporcionado por el usuario'
-    ),
-    (
-        'enrollment-2027', '2026-2',
-        'Matrícula de estudiantes antiguos',
-        '2026-12-21', '2026-12-31', 0,
-        'Calendario académico UCSH 2026 proporcionado por el usuario'
-    ),
-    (
-        'course-registration-2027-1', '2026-2',
-        'Solicitud de carga académica 2027/1',
-        '2026-12-29', '2026-12-30', 1,
-        'Calendario académico UCSH 2026 proporcionado por el usuario'
+        'workshop-lengua-senas', '2026-2',
+        'Señas que conectan · Lengua de señas chilena, nivel básico',
+        'workshop', 5,
+        '13:00', '14:20',
+        'Franklin Cubillán', 'facilitator', NULL,
+        '2026-10-20', '2026-12-19'
     );

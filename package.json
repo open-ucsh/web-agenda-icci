@@ -30,7 +30,9 @@
     "prepare": "vp config",
     "check": "vp run data:export && vp check",
     "test": "vp run data:export && vp test",
-    "data:export": "python3 scripts/export-agenda.py"
+    "data:export": "python3 scripts/export-agenda.py",
+    "data:sync-holidays": "python3 scripts/sync_holidays.py",
+    "test:data": "python3 -m unittest discover -s scripts -p 'test_*.py'"
   },
   "dependencies": {
     "lucide-react": "^1.59.0",

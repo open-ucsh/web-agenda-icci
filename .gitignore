@@ -34,3 +34,8 @@ dist-ssr
 # Datos generados desde SQLite
 /src/data/agenda.generated.ts
 /.local-backups/
+
+# Generated files
+__pycache__
+database/agenda.backup-*.sqlite
+database/agenda.before-workshops.sqlite

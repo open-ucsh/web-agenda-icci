@@ -12,13 +12,14 @@ CREATE TABLE weekly_activities (
     id TEXT PRIMARY KEY,
     period_id TEXT NOT NULL REFERENCES academic_periods(id),
     name TEXT NOT NULL CHECK (length(trim(name)) > 0),
-    type TEXT NOT NULL CHECK (type IN ('pace', 'mentoring', 'tutoring')),
+    type TEXT NOT NULL
+    CHECK (type IN ('pace', 'mentoring', 'tutoring', 'workshop')),
     weekday INTEGER NOT NULL CHECK (weekday BETWEEN 1 AND 7),
     start_time TEXT NOT NULL,
     end_time TEXT NOT NULL,
     responsible_name TEXT NOT NULL,
     responsible_role TEXT NOT NULL
-        CHECK (responsible_role IN ('student', 'professor')),
+    CHECK (responsible_role IN ('student', 'professor', 'facilitator')),
     location TEXT,
     valid_from TEXT NOT NULL,
     valid_until TEXT NOT NULL,
@@ -54,3 +55,15 @@ CREATE TABLE academic_dates (
 
 CREATE INDEX academic_dates_period
     ON academic_dates(period_id, starts_on);
+
+CREATE TABLE holidays (
+    date TEXT PRIMARY KEY,
+    name TEXT NOT NULL CHECK (length(trim(name)) > 0),
+    source TEXT NOT NULL,
+    CHECK (length(date) = 10 AND date(date) IS NOT NULL)
+) STRICT;
+
+CREATE TABLE holiday_sync (
+    year INTEGER PRIMARY KEY,
+    synced_at TEXT NOT NULL
+) STRICT;
