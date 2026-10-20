@@ -1,4 +1,4 @@
-import { academicDates, periods, schedules } from "@/data/agenda.generated";
+import { academicDates, holidays, periods, schedules } from "@/data/agenda.generated";
 
 export type ActivityType = "pace" | "mentoring" | "tutoring";
 
@@ -15,8 +15,17 @@ export interface Activity {
   mentor: string;
 }
 
+export interface Holiday {
+  date: string;
+  name: string;
+  source: string;
+}
+
 export const PERIODS = periods;
 export const ACADEMIC_DATES = academicDates;
+export const HOLIDAYS: readonly Holiday[] = holidays;
+
+const holidaysByDate = new Map<string, Holiday>(HOLIDAYS.map((holiday) => [holiday.date, holiday]));
 
 export const COURSES = schedules.map((schedule) => ({
   id: schedule.id,
@@ -29,6 +38,10 @@ function dateKey(date: Date): string {
     String(date.getMonth() + 1).padStart(2, "0"),
     String(date.getDate()).padStart(2, "0"),
   ].join("-");
+}
+
+export function getHoliday(date: string): Holiday | undefined {
+  return holidaysByDate.get(date);
 }
 
 export function getSantiagoDate(now: Date = new Date()): Date {
@@ -64,9 +77,10 @@ export function getWeekActivities(weekStart: Date, periodId: string): Activity[]
       weekStart.getDate() + schedule.weekday - 1,
       12,
     );
+
     const key = dateKey(date);
 
-    if (key < schedule.validFrom || key > schedule.validUntil) {
+    if (key < schedule.validFrom || key > schedule.validUntil || getHoliday(key)) {
       return [];
     }
 

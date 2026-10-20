@@ -7,6 +7,7 @@ import { MonthPicker } from "@/components/calendar/MonthPicker";
 import {
   ACADEMIC_DATES,
   COURSES,
+  getHoliday,
   getSantiagoDate,
   type Activity,
   type ActivityType,
@@ -103,7 +104,6 @@ export function WeekCalendar({
   const triggerRef = useRef<HTMLButtonElement | null>(null);
 
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
-
   const [selectedDay, setSelectedDay] = useState(() => (getSantiagoDate().getDay() + 6) % 7);
 
   const days = Array.from({ length: 7 }, (_, index) => addDays(weekStart, index));
@@ -114,9 +114,13 @@ export function WeekCalendar({
   const todayKey = dateKey(getSantiagoDate());
   const selectedDate = addDays(weekStart, selectedDay);
   const selectedKey = dateKey(selectedDate);
+  const selectedHoliday = getHoliday(selectedKey);
 
   const weekActivities = activities
-    .filter((activity) => activity.date >= firstKey && activity.date <= lastKey)
+    .filter(
+      (activity) =>
+        activity.date >= firstKey && activity.date <= lastKey && !getHoliday(activity.date),
+    )
     .toSorted(
       (first, second) =>
         first.startTime.localeCompare(second.startTime) || first.id.localeCompare(second.id),
@@ -130,6 +134,8 @@ export function WeekCalendar({
     (first, second) =>
       first.startsOn.localeCompare(second.startsOn) || first.id.localeCompare(second.id),
   );
+
+  const hasHolidays = days.some((day) => getHoliday(dateKey(day)));
 
   const startHour = Math.min(
     9,
@@ -162,10 +168,11 @@ export function WeekCalendar({
   }
 
   function goToMonth(date: Date): void {
-    const firstAvailableDate = date < new Date(2026, 9, 1, 12) ? new Date(2026, 9, 1, 12) : date;
+    const minimum = new Date(2026, 9, 1, 12);
+    const availableDate = date < minimum ? minimum : date;
 
-    setSelectedDay((firstAvailableDate.getDay() + 6) % 7);
-    changeWeek(firstAvailableDate);
+    setSelectedDay((availableDate.getDay() + 6) % 7);
+    changeWeek(availableDate);
   }
 
   function openActivity(activity: Activity, trigger: HTMLButtonElement): void {
@@ -239,12 +246,15 @@ export function WeekCalendar({
           const key = dateKey(day);
           const selected = index === selectedDay;
           const isToday = key === todayKey;
+          const holiday = getHoliday(key);
           const count = weekActivities.filter((activity) => activity.date === key).length;
 
           return (
             <button
               aria-controls={mobilePanelId}
-              aria-label={`${fullDateFormatter.format(day)}. ${count} actividades${isToday ? ". Hoy" : ""}`}
+              aria-label={`${fullDateFormatter.format(day)}. ${
+                holiday ? `Feriado: ${holiday.name}` : `${count} actividades`
+              }${isToday ? ". Hoy" : ""}`}
               aria-pressed={selected}
               className={[
                 "flex min-w-0 flex-col items-center gap-1 rounded-lg border py-2 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand",
@@ -275,7 +285,7 @@ export function WeekCalendar({
                   selected ? "text-white/75" : "text-muted",
                 ].join(" ")}
               >
-                {count || "–"}
+                {holiday ? "Fest." : count || "–"}
               </span>
             </button>
           );
@@ -298,7 +308,7 @@ export function WeekCalendar({
           </p>
 
           <span className="shrink-0 text-xs tabular-nums text-muted">
-            {selectedActivities.length} act.
+            {selectedHoliday ? "Feriado" : `${selectedActivities.length} act.`}
           </span>
         </div>
 
@@ -319,12 +329,13 @@ export function WeekCalendar({
                 {days.map((day, index) => {
                   const key = dateKey(day);
                   const isToday = key === todayKey;
+                  const holiday = getHoliday(key);
 
                   return (
                     <div
                       className={[
                         "flex min-w-0 flex-1 flex-col items-center gap-1 border-l border-border py-3",
-                        index >= 5 ? "bg-surface" : "bg-background",
+                        holiday || index >= 5 ? "bg-surface" : "bg-background",
                       ].join(" ")}
                       key={key}
                     >
@@ -347,7 +358,7 @@ export function WeekCalendar({
                 })}
               </div>
 
-              {visibleAcademicDates.length > 0 && (
+              {(visibleAcademicDates.length > 0 || hasHolidays) && (
                 <div className="flex md:border-t md:border-border">
                   <div className="sticky left-0 z-30 flex w-12 shrink-0 items-center justify-center bg-background px-1 py-2 md:w-16 md:px-2">
                     <span className="text-center text-xs leading-4 text-muted">Fechas clave</span>
@@ -355,6 +366,7 @@ export function WeekCalendar({
 
                   {days.map((day, index) => {
                     const key = dateKey(day);
+                    const holiday = getHoliday(key);
                     const dates = visibleAcademicDates.filter(
                       (item) => item.startsOn <= key && item.endsOn >= key,
                     );
@@ -364,10 +376,20 @@ export function WeekCalendar({
                         className={[
                           "min-w-0 flex-1 space-y-1 border-l border-border p-1.5",
                           index === selectedDay ? "block" : "hidden md:block",
-                          index >= 5 ? "bg-surface" : "bg-background",
+                          holiday || index >= 5 ? "bg-surface" : "bg-background",
                         ].join(" ")}
                         key={key}
                       >
+                        {holiday && (
+                          <div
+                            className="rounded-md border border-brand/10 bg-brand/5 px-2 py-1.5 text-xs text-brand"
+                            title={`Feriado nacional: ${holiday.name}. Sin actividades.`}
+                          >
+                            <p className="font-semibold">Feriado nacional</p>
+                            <p className="mt-0.5 leading-5 md:truncate">{holiday.name}</p>
+                          </div>
+                        )}
+
                         {dates.map((item) => (
                           <p
                             className="rounded border border-tutoring/15 bg-tutoring-surface px-2 py-1 text-xs leading-5 text-tutoring md:truncate"
@@ -378,7 +400,7 @@ export function WeekCalendar({
                           </p>
                         ))}
 
-                        {dates.length === 0 && (
+                        {!holiday && dates.length === 0 && (
                           <span className="px-2 text-xs text-muted md:hidden">
                             Sin fechas clave este día
                           </span>
@@ -408,15 +430,18 @@ export function WeekCalendar({
 
               {days.map((day, index) => {
                 const key = dateKey(day);
+                const holiday = getHoliday(key);
                 const dayActivities = weekActivities.filter((activity) => activity.date === key);
 
                 return (
                   <section
-                    aria-label={fullDateFormatter.format(day)}
+                    aria-label={`${fullDateFormatter.format(day)}${
+                      holiday ? `. Feriado: ${holiday.name}` : ""
+                    }`}
                     className={[
                       "relative min-w-0 flex-1 border-l border-border",
                       index === selectedDay ? "block" : "hidden md:block",
-                      index >= 5 ? "bg-surface/70" : "bg-background",
+                      holiday || index >= 5 ? "bg-surface/70" : "bg-background",
                     ].join(" ")}
                     key={key}
                   >
@@ -492,9 +517,11 @@ export function WeekCalendar({
         aria-live="polite"
         className="mt-2 shrink-0 text-center text-xs leading-5 text-muted md:hidden"
       >
-        {selectedActivities.length === 0
-          ? "Sin actividades este día con los filtros seleccionados."
-          : "Selecciona una actividad para ver sus detalles."}
+        {selectedHoliday
+          ? "Feriado nacional · Sin actividades de apoyo académico."
+          : selectedActivities.length === 0
+            ? "Sin actividades este día con los filtros seleccionados."
+            : "Selecciona una actividad para ver sus detalles."}
       </p>
 
       {weekActivities.length === 0 && (

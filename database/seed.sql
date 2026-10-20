@@ -42,7 +42,7 @@ VALUES
     (
         'mentoring-fisica', '2026-2', 'Física', 'mentoring', 1,
         '15:00', '16:00',
-        'Olver Rodríguez', 'professor', 'Edificio PACE · 4.º piso',
+        'Oliver Rodríguez', 'professor', 'Edificio PACE · 4.º piso',
         '2026-10-19', '2026-12-19'
     );
 
