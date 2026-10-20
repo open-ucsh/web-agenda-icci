@@ -1,4 +1,5 @@
 import { Dialog } from "@/components/ui/Dialog";
+import { CalendarExportActions } from "@/components/calendar/CalendarExportActions";
 
 import { ACTIVITY_TYPE_CONFIG } from "@/config/activity-types";
 
@@ -135,6 +136,16 @@ export function ActivityDetails({
                 </div>
               </div>
             </dl>
+
+            <div className="mt-4 border-t border-border pt-4">
+              <CalendarExportActions
+                key={activity.id}
+                activities={[activity]}
+                filename={`agenda-icci-${activity.date}-${activity.startTime.replace(":", "")}.ics`}
+                label="Descargar actividad (.ics)"
+                googleActivity={activity}
+              />
+            </div>
           </>
         )}
       </div>
