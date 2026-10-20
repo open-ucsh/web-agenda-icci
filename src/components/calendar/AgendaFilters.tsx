@@ -30,7 +30,7 @@ export function AgendaFilters({ selectedTypes, onTypeToggle }: AgendaFiltersProp
   return (
     <div
       aria-label="Tipos de apoyo académico"
-      className="flex flex-wrap items-center gap-2"
+      className="grid w-full grid-cols-3 gap-2 lg:flex lg:w-auto lg:items-center"
       role="group"
     >
       {ACTIVITY_FILTERS.map((filter) => {
@@ -40,7 +40,7 @@ export function AgendaFilters({ selectedTypes, onTypeToggle }: AgendaFiltersProp
           <button
             aria-pressed={selected}
             className={[
-              "inline-flex h-8 items-center gap-2 rounded-md border px-3 text-xs font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand sm:h-9",
+              "inline-flex h-10 min-w-0 items-center justify-center gap-1.5 rounded-md border px-2 text-xs font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand lg:px-3",
               selected ? filter.active : "border-border bg-background text-muted hover:bg-surface",
             ].join(" ")}
             key={filter.id}
@@ -49,12 +49,14 @@ export function AgendaFilters({ selectedTypes, onTypeToggle }: AgendaFiltersProp
           >
             <span
               aria-hidden="true"
-              className={["size-2 rounded-full", filter.dot, selected ? "" : "opacity-35"].join(
-                " ",
-              )}
+              className={[
+                "size-2 shrink-0 rounded-full",
+                filter.dot,
+                selected ? "" : "opacity-35",
+              ].join(" ")}
             />
 
-            {filter.label}
+            <span>{filter.label}</span>
           </button>
         );
       })}

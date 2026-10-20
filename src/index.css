@@ -8,12 +8,14 @@
   --color-border: #e2e8f0;
   --color-text: #142b4a;
   --color-muted: #64748b;
+
   --color-pace: #15803d;
   --color-pace-surface: #f0fdf4;
   --color-mentoring: #2563eb;
   --color-mentoring-surface: #eff6ff;
   --color-tutoring: #b45309;
   --color-tutoring-surface: #fffbeb;
+
   --font-sans: ui-sans-serif, system-ui, sans-serif;
 }
 
@@ -27,4 +29,27 @@ body {
 button:not(:disabled),
 summary {
   cursor: pointer;
+}
+
+.agenda-dialog {
+  max-width: calc(100vw - 2rem);
+  max-height: calc(100dvh - 2rem);
+}
+
+.agenda-dialog-content {
+  max-height: inherit;
+}
+
+.month-picker-panel {
+  max-height: calc(100dvh - 2rem);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0s !important;
+    animation-duration: 0s !important;
+  }
 }

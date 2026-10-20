@@ -24,9 +24,9 @@ export function Navbar({ periods, selectedPeriod, onPeriodChange }: NavbarProps)
     <header className="shrink-0 border-b border-border bg-background">
       <nav
         aria-label="Navegación principal"
-        className="mx-auto flex max-w-screen-2xl flex-wrap items-center gap-x-4 px-4 sm:gap-x-6 sm:px-6 lg:px-8"
+        className="mx-auto grid max-w-screen-2xl grid-cols-1 px-4 sm:px-6 lg:flex lg:items-center lg:gap-6 lg:px-8"
       >
-        <div className="flex h-16 min-w-0 items-center gap-3 sm:gap-5">
+        <div className="flex h-14 min-w-0 items-center gap-3 lg:h-16">
           <a
             aria-label="Open UCSH en GitHub"
             className="shrink-0 rounded-md transition-opacity hover:opacity-75 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand"
@@ -36,28 +36,32 @@ export function Navbar({ periods, selectedPeriod, onPeriodChange }: NavbarProps)
           >
             <img
               alt=""
-              className="size-10 object-contain"
+              className="size-8 object-contain lg:size-10"
               height={40}
               src={`${import.meta.env.BASE_URL}logo.png`}
               width={40}
             />
           </a>
 
-          <span aria-hidden="true" className="h-8 w-px bg-border" />
+          <span aria-hidden="true" className="h-6 w-px bg-border" />
 
-          <h1 className="truncate text-base font-semibold tracking-tight text-brand sm:text-lg">
+          <h1 className="min-w-0 truncate text-base font-semibold tracking-tight text-brand lg:text-lg">
             Agenda ICCI
           </h1>
+
+          <div className="ml-auto lg:hidden">
+            <AcademicDates periodId={selectedPeriod} />
+          </div>
         </div>
 
         <div
           aria-label="Secciones de la agenda"
-          className="order-last flex h-11 w-full items-center gap-5 border-t border-border sm:order-0 sm:h-16 sm:w-auto sm:border-0"
+          className="hidden h-16 items-center gap-3 lg:flex"
           role="group"
         >
           <span
             aria-current="page"
-            className="flex h-full items-center border-b-2 border-brand text-xs font-semibold text-brand sm:text-sm"
+            className="flex h-full items-center border-b-2 border-brand px-1 text-sm font-semibold text-brand"
           >
             Calendario
           </span>
@@ -65,20 +69,20 @@ export function Navbar({ periods, selectedPeriod, onPeriodChange }: NavbarProps)
           <AcademicDates periodId={selectedPeriod} />
         </div>
 
-        <div className="ml-auto flex items-center gap-2 sm:gap-3">
-          <div className="relative">
+        <div className="flex min-w-0 items-center gap-2 border-t border-border py-2 lg:ml-auto lg:border-0 lg:py-0">
+          <div className="relative min-w-0 flex-1 lg:flex-none">
             <label className="sr-only" htmlFor={periodId}>
               Período académico
             </label>
 
             <CalendarDays
               aria-hidden="true"
-              className="pointer-events-none absolute top-1/2 left-3 hidden size-4 -translate-y-1/2 text-brand lg:block"
+              className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-brand"
               strokeWidth={1.75}
             />
 
             <select
-              className="h-9 w-32 appearance-none rounded-md border border-border bg-background pr-8 pl-3 text-xs font-medium text-brand transition-colors hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand sm:w-48 lg:w-60 lg:pl-9 lg:text-sm"
+              className="h-10 w-full appearance-none rounded-md border border-border bg-background pr-9 pl-9 text-sm font-medium text-brand transition-colors hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand lg:w-60"
               id={periodId}
               onChange={(event) => onPeriodChange(event.currentTarget.value)}
               value={selectedPeriod}
@@ -96,15 +100,12 @@ export function Navbar({ periods, selectedPeriod, onPeriodChange }: NavbarProps)
             />
           </div>
 
-          <span aria-hidden="true" className="hidden h-6 w-px bg-border sm:block" />
-
           <button
             aria-haspopup="dialog"
             aria-label="Ayuda de Agenda ICCI"
-            className="grid size-9 shrink-0 place-items-center rounded-md text-muted transition-colors hover:bg-surface hover:text-brand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+            className="grid size-10 shrink-0 place-items-center rounded-md text-muted transition-colors hover:bg-surface hover:text-brand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
             onClick={() => helpRef.current?.showModal()}
             ref={helpButtonRef}
-            title="Ayuda"
             type="button"
           >
             <CircleHelp aria-hidden="true" className="size-5" strokeWidth={1.75} />
@@ -114,49 +115,56 @@ export function Navbar({ periods, selectedPeriod, onPeriodChange }: NavbarProps)
 
       <dialog
         aria-labelledby={helpTitleId}
-        className="fixed inset-0 m-auto w-80 max-w-full rounded-xl border border-border bg-background p-5 text-text shadow-xl backdrop:bg-slate-950/25"
+        className="agenda-dialog fixed inset-0 m-auto w-96 overflow-hidden rounded-xl border border-border bg-background p-0 text-text shadow-xl backdrop:bg-slate-950/25"
         onClose={() => helpButtonRef.current?.focus()}
         ref={helpRef}
       >
-        <div className="flex items-center justify-between gap-3">
-          <h2 className="text-base font-semibold text-brand" id={helpTitleId}>
-            Agenda ICCI
-          </h2>
+        <div className="agenda-dialog-content flex flex-col">
+          <header className="flex shrink-0 items-center justify-between gap-3 border-b border-border px-5 py-3">
+            <h2 className="text-base font-semibold text-brand" id={helpTitleId}>
+              Agenda ICCI
+            </h2>
 
-          <button
-            aria-label="Cerrar ayuda"
-            className="grid size-8 shrink-0 place-items-center rounded-md text-muted transition-colors hover:bg-surface hover:text-brand focus-visible:outline-2 focus-visible:outline-brand"
-            onClick={() => helpRef.current?.close()}
-            type="button"
-          >
-            <X aria-hidden="true" className="size-4" />
-          </button>
-        </div>
+            <button
+              aria-label="Cerrar ayuda"
+              className="grid size-10 shrink-0 place-items-center rounded-md text-muted transition-colors hover:bg-surface hover:text-brand focus-visible:outline-2 focus-visible:outline-brand"
+              onClick={() => helpRef.current?.close()}
+              type="button"
+            >
+              <X aria-hidden="true" className="size-4" />
+            </button>
+          </header>
 
-        <p className="mt-3 text-sm leading-6 text-muted">
-          Consulta las actividades PACE, mentorías y ayudantías de Ingeniería Civil en Computación e
-          Informática.
-        </p>
+          <div className="min-h-0 space-y-3 overflow-y-auto overscroll-contain p-5 text-sm leading-6 text-muted">
+            <p>
+              Consulta las actividades PACE, mentorías y ayudantías de Ingeniería Civil en
+              Computación e Informática.
+            </p>
 
-        <p className="mt-3 text-sm leading-6 text-muted">
-          Usa las flechas para cambiar de semana o selecciona el mes para ir a otra fecha. El botón
-          Hoy vuelve a la semana actual.
-        </p>
+            <p>
+              Usa las flechas para cambiar de semana o selecciona el mes para ir a otra fecha. Hoy
+              vuelve a la semana actual.
+            </p>
 
-        <p className="mt-3 text-sm leading-6 text-muted">
-          Los filtros permiten mostrar u ocultar cada tipo de apoyo. Selecciona una actividad para
-          consultar sus detalles.
-        </p>
+            <p>
+              En móvil, selecciona un día para consultar su horario. Los números bajo cada fecha
+              indican las actividades visibles.
+            </p>
 
-        <div className="mt-4 border-t border-border pt-3">
-          <a
-            className="rounded text-sm font-medium text-brand transition-colors hover:text-brand-hover focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand"
-            href="https://github.com/open-ucsh"
-            rel="noreferrer"
-            target="_blank"
-          >
-            Un proyecto de Open UCSH
-          </a>
+            <p>
+              Activa o desactiva los filtros para elegir el tipo de apoyo. Selecciona una actividad
+              para consultar sus detalles.
+            </p>
+
+            <a
+              className="inline-block rounded font-medium text-brand hover:text-brand-hover focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand"
+              href="https://github.com/open-ucsh"
+              rel="noreferrer"
+              target="_blank"
+            >
+              Un proyecto de Open UCSH
+            </a>
+          </div>
         </div>
       </dialog>
     </header>

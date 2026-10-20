@@ -10,6 +10,8 @@ import {
   type ActivityType,
 } from "@/data/activities";
 
+const FIRST_WEEK = startOfWeek(new Date(2026, 9, 1, 12));
+
 const milestoneFormatter = new Intl.DateTimeFormat("es-CL", {
   day: "numeric",
   month: "short",
@@ -27,19 +29,31 @@ function formatDate(value: string): string {
   return milestoneFormatter.format(new Date(`${value}T12:00:00`));
 }
 
+function clampWeek(date: Date): Date {
+  const week = startOfWeek(date);
+
+  return week < FIRST_WEEK ? new Date(FIRST_WEEK) : week;
+}
+
 export default function App() {
   const [selectedPeriod, setSelectedPeriod] = useState<string>(PERIODS[0]?.id ?? "");
+
   const [selectedTypes, setSelectedTypes] = useState<ActivityType[]>([
     "pace",
     "mentoring",
     "tutoring",
   ]);
-  const [weekStart, setWeekStart] = useState(() => startOfWeek(getSantiagoDate()));
+
+  const [weekStart, setWeekStart] = useState(() => clampWeek(getSantiagoDate()));
 
   function toggleActivityType(type: ActivityType): void {
     setSelectedTypes((current) =>
       current.includes(type) ? current.filter((item) => item !== type) : [...current, type],
     );
+  }
+
+  function changeWeek(date: Date): void {
+    setWeekStart(clampWeek(date));
   }
 
   const filteredActivities = getWeekActivities(weekStart, selectedPeriod).filter((activity) =>
@@ -52,12 +66,16 @@ export default function App() {
     weekStart.getDate() + 6,
     12,
   );
+
   const weekStartKey = dateKey(weekStart);
   const weekEndKey = dateKey(weekEnd);
 
   const featuredDates = ACADEMIC_DATES.filter(
     (item) => item.periodId === selectedPeriod && item.featured === 1,
-  ).toSorted((first, second) => first.startsOn.localeCompare(second.startsOn));
+  ).toSorted(
+    (first, second) =>
+      first.startsOn.localeCompare(second.startsOn) || first.id.localeCompare(second.id),
+  );
 
   const milestone =
     featuredDates.find((item) => item.endsOn >= weekStartKey && item.startsOn <= weekEndKey) ??
@@ -78,13 +96,13 @@ export default function App() {
         <WeekCalendar
           activities={filteredActivities}
           onTypeToggle={toggleActivityType}
-          onWeekChange={setWeekStart}
+          onWeekChange={changeWeek}
           periodId={selectedPeriod}
           selectedTypes={selectedTypes}
           weekStart={weekStart}
         />
 
-        <footer className="flex shrink-0 items-center justify-between gap-4 pt-3 text-xs leading-5 text-muted">
+        <footer className="hidden shrink-0 items-center justify-between gap-4 pt-3 text-xs leading-5 text-muted md:flex">
           <p className="min-w-0 truncate">
             {milestone ? (
               <>

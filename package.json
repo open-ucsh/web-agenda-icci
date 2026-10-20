@@ -2,7 +2,26 @@
   "name": "web-agenda-icci",
   "version": "0.1.0",
   "private": true,
-  "description": "Agenda de mentorías, apoyo PACE y ayudantías de ICCI UCSH.",
+  "description": "Agenda académica de ICCI UCSH para mentorías, apoyo PACE y ayudantías con calendario semanal y hitos del semestre.",
+  "keywords": [
+    "academica",
+    "agenda",
+    "calendar",
+    "educacion",
+    "icci",
+    "mentorias",
+    "pace",
+    "react",
+    "tutoria",
+    "ucsh",
+    "universidad",
+    "vite"
+  ],
+  "homepage": "https://github.com/open-ucsh/web-agenda-icci",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/open-ucsh/web-agenda-icci.git"
+  },
   "type": "module",
   "scripts": {
     "dev": "vp run data:export && vp dev",
