@@ -2,7 +2,7 @@ import json
 import sqlite3
 from pathlib import Path
 
-from sync_holidays import sync_holidays
+from holiday_cache import validate_cached_holidays
 
 root = Path(__file__).resolve().parent.parent
 database = root / "database" / "agenda.sqlite"
@@ -44,7 +44,7 @@ queries = {
 
 try:
     with sqlite3.connect(
-        f"{database.resolve().as_uri()}?mode=rw",
+        f"{database.resolve().as_uri()}?mode=ro",
         uri=True,
     ) as connection:
         if connection.execute("PRAGMA integrity_check").fetchone()[0] != "ok":
@@ -55,7 +55,7 @@ try:
         if connection.execute("PRAGMA foreign_key_check").fetchall():
             raise RuntimeError("La base tiene referencias inválidas.")
 
-        sync_holidays(connection)
+        validate_cached_holidays(connection)
         connection.row_factory = sqlite3.Row
 
         sections = [
@@ -76,4 +76,4 @@ output.parent.mkdir(parents=True, exist_ok=True)
 if not output.exists() or output.read_text(encoding="utf-8") != content:
     output.write_text(content, encoding="utf-8")
 
-print("Agenda y feriados exportados desde SQLite.")
+print("Agenda y feriados exportados desde SQLite, sin acceso a red.")

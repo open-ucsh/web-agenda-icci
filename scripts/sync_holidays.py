@@ -6,20 +6,9 @@ from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
+from holiday_cache import required_years, validate_cached_holidays
+
 API_URL = "https://api.boostr.cl/holidays.json"
-
-
-def required_years(connection: sqlite3.Connection) -> set[int]:
-    years = set()
-
-    for starts_on, ends_on in connection.execute(
-        "SELECT valid_from, valid_until FROM weekly_activities"
-    ):
-        first_year = date.fromisoformat(starts_on).year
-        last_year = date.fromisoformat(ends_on).year
-        years.update(range(first_year, last_year + 1))
-
-    return years
 
 
 def fetch_holidays() -> dict[int, dict[str, str]]:
@@ -136,31 +125,7 @@ def sync_holidays(connection: sqlite3.Connection) -> None:
 
         print("Feriados actualizados desde Boostr.")
 
-    cached_years = {
-        row[0]
-        for row in connection.execute(
-            """
-            SELECT year
-            FROM holiday_sync
-            WHERE EXISTS (
-                SELECT 1
-                FROM holidays
-                WHERE substr(date, 1, 4) = CAST(holiday_sync.year AS TEXT)
-            )
-            """
-        )
-    }
-
-    missing = years - cached_years
-
-    if missing:
-        missing_labels = ", ".join(str(year) for year in sorted(missing))
-
-        raise RuntimeError(
-            f"No hay feriados sincronizados para: {missing_labels}. "
-            "La API publica el año actual; los años anteriores deben "
-            "conservarse en agenda.sqlite."
-        )
+    validate_cached_holidays(connection)
 
     print("Cobertura de feriados disponible para los horarios publicados.")
 
