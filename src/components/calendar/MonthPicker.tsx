@@ -1,3 +1,5 @@
+import { getFirstAvailableDate } from "@/config/agenda";
+
 import { ChevronDown, ChevronLeft, ChevronRight, LockKeyhole, X } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 
@@ -7,8 +9,14 @@ interface MonthPickerProps {
   onChange: (date: Date) => void;
 }
 
-const MIN_YEAR = 2026;
-const MIN_MONTH = 9;
+const firstAvailableDate = getFirstAvailableDate();
+const MIN_YEAR = firstAvailableDate.getFullYear();
+const MIN_MONTH = firstAvailableDate.getMonth();
+
+const availabilityLabel = new Intl.DateTimeFormat("es-CL", {
+  month: "long",
+  year: "numeric",
+}).format(firstAvailableDate);
 
 const MONTHS = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
 
@@ -212,7 +220,7 @@ export function MonthPicker({ date, label, onChange }: MonthPickerProps) {
               strokeWidth={1.75}
             />
 
-            <span>Disponible desde octubre de 2026</span>
+            <span>Disponible desde {availabilityLabel}</span>
           </footer>
         </div>
       )}

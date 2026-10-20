@@ -1,48 +1,26 @@
+import { ACTIVITY_TYPES } from "@/config/activity-types";
+
 import { useState } from "react";
 
 import { Navbar } from "@/components/Navbar";
-import { startOfWeek, WeekCalendar } from "@/components/calendar/WeekCalendar";
-import {
-  ACADEMIC_DATES,
-  getSantiagoDate,
-  getWeekActivities,
-  PERIODS,
-  type ActivityType,
-} from "@/data/activities";
-
-const FIRST_WEEK = startOfWeek(new Date(2026, 9, 1, 12));
+import { WeekCalendar } from "@/components/calendar/WeekCalendar";
+import { clampWeek, getSantiagoDate } from "@/config/agenda";
+import { addDays, dateKey, parseDateKey } from "@/lib/dates";
+import { ACADEMIC_DATES, getWeekActivities, PERIODS, type ActivityType } from "@/data/activities";
 
 const milestoneFormatter = new Intl.DateTimeFormat("es-CL", {
   day: "numeric",
   month: "short",
 });
 
-function dateKey(date: Date): string {
-  return [
-    date.getFullYear(),
-    String(date.getMonth() + 1).padStart(2, "0"),
-    String(date.getDate()).padStart(2, "0"),
-  ].join("-");
-}
-
 function formatDate(value: string): string {
-  return milestoneFormatter.format(new Date(`${value}T12:00:00`));
-}
-
-function clampWeek(date: Date): Date {
-  const week = startOfWeek(date);
-
-  return week < FIRST_WEEK ? new Date(FIRST_WEEK) : week;
+  return milestoneFormatter.format(parseDateKey(value));
 }
 
 export default function App() {
   const [selectedPeriod, setSelectedPeriod] = useState<string>(PERIODS[0]?.id ?? "");
 
-  const [selectedTypes, setSelectedTypes] = useState<ActivityType[]>([
-    "pace",
-    "mentoring",
-    "tutoring",
-  ]);
+  const [selectedTypes, setSelectedTypes] = useState<ActivityType[]>(() => [...ACTIVITY_TYPES]);
 
   const [weekStart, setWeekStart] = useState(() => clampWeek(getSantiagoDate()));
 
@@ -60,12 +38,7 @@ export default function App() {
     selectedTypes.includes(activity.type),
   );
 
-  const weekEnd = new Date(
-    weekStart.getFullYear(),
-    weekStart.getMonth(),
-    weekStart.getDate() + 6,
-    12,
-  );
+  const weekEnd = addDays(weekStart, 6);
 
   const weekStartKey = dateKey(weekStart);
   const weekEndKey = dateKey(weekEnd);

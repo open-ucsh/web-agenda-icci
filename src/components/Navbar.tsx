@@ -1,3 +1,5 @@
+import { Dialog } from "@/components/ui/Dialog";
+
 import { CalendarDays, ChevronDown, CircleHelp, X } from "lucide-react";
 import { useId, useRef } from "react";
 
@@ -113,60 +115,58 @@ export function Navbar({ periods, selectedPeriod, onPeriodChange }: NavbarProps)
         </div>
       </nav>
 
-      <dialog
+      <Dialog
         aria-labelledby={helpTitleId}
-        className="agenda-dialog fixed inset-0 m-auto w-96 overflow-hidden rounded-xl border border-border bg-background p-0 text-text shadow-xl backdrop:bg-slate-950/25"
-        onClose={() => helpButtonRef.current?.focus()}
-        ref={helpRef}
+        dialogRef={helpRef}
+        restoreFocusRef={helpButtonRef}
+        size="small"
       >
-        <div className="agenda-dialog-content flex flex-col">
-          <header className="flex shrink-0 items-center justify-between gap-3 border-b border-border px-5 py-3">
-            <h2 className="text-base font-semibold text-brand" id={helpTitleId}>
-              Agenda ICCI
-            </h2>
+        <header className="flex shrink-0 items-center justify-between gap-3 border-b border-border px-5 py-3">
+          <h2 className="text-base font-semibold text-brand" id={helpTitleId}>
+            Agenda ICCI
+          </h2>
 
-            <button
-              aria-label="Cerrar ayuda"
-              className="grid size-10 shrink-0 place-items-center rounded-md text-muted transition-colors hover:bg-surface hover:text-brand focus-visible:outline-2 focus-visible:outline-brand"
-              onClick={() => helpRef.current?.close()}
-              type="button"
-            >
-              <X aria-hidden="true" className="size-4" />
-            </button>
-          </header>
+          <button
+            aria-label="Cerrar ayuda"
+            className="grid size-10 shrink-0 place-items-center rounded-md text-muted transition-colors hover:bg-surface hover:text-brand focus-visible:outline-2 focus-visible:outline-brand"
+            onClick={() => helpRef.current?.close()}
+            type="button"
+          >
+            <X aria-hidden="true" className="size-4" />
+          </button>
+        </header>
 
-          <div className="min-h-0 space-y-3 overflow-y-auto overscroll-contain p-5 text-sm leading-6 text-muted">
-            <p>
-              Consulta las actividades PACE, mentorías y ayudantías de Ingeniería Civil en
-              Computación e Informática.
-            </p>
+        <div className="min-h-0 space-y-3 overflow-y-auto overscroll-contain p-5 text-sm leading-6 text-muted">
+          <p>
+            Consulta las actividades PACE, mentorías y ayudantías de Ingeniería Civil en Computación
+            e Informática.
+          </p>
 
-            <p>
-              Usa las flechas para cambiar de semana o selecciona el mes para ir a otra fecha. Hoy
-              vuelve a la semana actual.
-            </p>
+          <p>
+            Usa las flechas para cambiar de semana o selecciona el mes para ir a otra fecha. Hoy
+            vuelve a la semana actual.
+          </p>
 
-            <p>
-              En móvil, selecciona un día para consultar su horario. Los números bajo cada fecha
-              indican las actividades visibles.
-            </p>
+          <p>
+            En móvil, selecciona un día para consultar su horario. Los números bajo cada fecha
+            indican las actividades visibles.
+          </p>
 
-            <p>
-              Activa o desactiva los filtros para elegir el tipo de apoyo. Selecciona una actividad
-              para consultar sus detalles.
-            </p>
+          <p>
+            Activa o desactiva los filtros para elegir el tipo de apoyo. Selecciona una actividad
+            para consultar sus detalles.
+          </p>
 
-            <a
-              className="inline-block rounded font-medium text-brand hover:text-brand-hover focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand"
-              href="https://github.com/open-ucsh"
-              rel="noreferrer"
-              target="_blank"
-            >
-              Un proyecto de Open UCSH
-            </a>
-          </div>
+          <a
+            className="inline-block rounded font-medium text-brand hover:text-brand-hover focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand"
+            href="https://github.com/open-ucsh"
+            rel="noreferrer"
+            target="_blank"
+          >
+            Un proyecto de Open UCSH
+          </a>
         </div>
-      </dialog>
+      </Dialog>
     </header>
   );
 }

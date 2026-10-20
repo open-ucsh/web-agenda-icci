@@ -11,10 +11,15 @@
 
   --color-pace: #15803d;
   --color-pace-surface: #f0fdf4;
+
   --color-mentoring: #2563eb;
   --color-mentoring-surface: #eff6ff;
-  --color-tutoring: #b45309;
-  --color-tutoring-surface: #fffbeb;
+
+  --color-tutoring: #a16207;
+  --color-tutoring-surface: #fefce8;
+
+  --color-workshop: #be185d;
+  --color-workshop-surface: #fdf2f8;
 
   --font-sans: ui-sans-serif, system-ui, sans-serif;
 }

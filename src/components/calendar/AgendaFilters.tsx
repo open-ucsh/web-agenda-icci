@@ -1,3 +1,7 @@
+import { ACTIVITY_FILTERS } from "@/config/activity-types";
+
+import { Check } from "lucide-react";
+
 import type { ActivityType } from "@/data/activities";
 
 interface AgendaFiltersProps {
@@ -5,32 +9,11 @@ interface AgendaFiltersProps {
   onTypeToggle: (type: ActivityType) => void;
 }
 
-const ACTIVITY_FILTERS = [
-  {
-    id: "pace",
-    label: "PACE",
-    dot: "bg-pace",
-    active: "border-pace/20 bg-pace-surface text-pace",
-  },
-  {
-    id: "mentoring",
-    label: "Mentorías",
-    dot: "bg-mentoring",
-    active: "border-mentoring/20 bg-mentoring-surface text-mentoring",
-  },
-  {
-    id: "tutoring",
-    label: "Ayudantías",
-    dot: "bg-tutoring",
-    active: "border-tutoring/20 bg-tutoring-surface text-tutoring",
-  },
-] as const;
-
 export function AgendaFilters({ selectedTypes, onTypeToggle }: AgendaFiltersProps) {
   return (
     <div
-      aria-label="Tipos de apoyo académico"
-      className="grid w-full grid-cols-3 gap-2 lg:flex lg:w-auto lg:items-center"
+      aria-label="Tipos de actividades"
+      className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:flex lg:items-center"
       role="group"
     >
       {ACTIVITY_FILTERS.map((filter) => {
@@ -40,7 +23,7 @@ export function AgendaFilters({ selectedTypes, onTypeToggle }: AgendaFiltersProp
           <button
             aria-pressed={selected}
             className={[
-              "inline-flex h-10 min-w-0 items-center justify-center gap-1.5 rounded-md border px-2 text-xs font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand lg:px-3",
+              "inline-flex h-9 min-w-0 items-center justify-center gap-2 rounded-md border px-3 text-xs font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand",
               selected ? filter.active : "border-border bg-background text-muted hover:bg-surface",
             ].join(" ")}
             key={filter.id}
@@ -57,6 +40,12 @@ export function AgendaFilters({ selectedTypes, onTypeToggle }: AgendaFiltersProp
             />
 
             <span>{filter.label}</span>
+
+            <Check
+              aria-hidden="true"
+              className={["size-3 shrink-0", selected ? "visible" : "invisible"].join(" ")}
+              strokeWidth={2}
+            />
           </button>
         );
       })}
