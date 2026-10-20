@@ -30,3 +30,7 @@ dist-ssr
 .env
 .env.*
 !.env.example
+
+# Datos generados desde SQLite
+/src/data/agenda.generated.ts
+/.local-backups/

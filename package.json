@@ -5,12 +5,13 @@
   "description": "Agenda de mentorías, apoyo PACE y ayudantías de ICCI UCSH.",
   "type": "module",
   "scripts": {
-    "dev": "vp dev",
-    "build": "tsc --noEmit && vp build",
+    "dev": "vp run data:export && vp dev",
+    "build": "vp run data:export && tsc --noEmit && vp build",
     "preview": "vp preview",
     "prepare": "vp config",
-    "check": "vp check",
-    "test": "vp test"
+    "check": "vp run data:export && vp check",
+    "test": "vp run data:export && vp test",
+    "data:export": "python3 scripts/export-agenda.py"
   },
   "dependencies": {
     "lucide-react": "^1.59.0",
