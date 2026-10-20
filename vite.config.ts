@@ -5,6 +5,7 @@ import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite-plus";
 
 export default defineConfig({
+  base: "/web-agenda-icci/",
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
