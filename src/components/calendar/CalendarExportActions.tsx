@@ -9,6 +9,7 @@ interface CalendarExportActionsProps {
   filename: string;
   label: string;
   googleActivity?: Activity;
+  compact?: boolean;
 }
 
 const actionClass =
@@ -19,6 +20,7 @@ export function CalendarExportActions({
   filename,
   label,
   googleActivity,
+  compact = false,
 }: CalendarExportActionsProps) {
   const [error, setError] = useState<string | null>(null);
 
@@ -45,13 +47,19 @@ export function CalendarExportActions({
     <div className="flex flex-col gap-2">
       <div className="flex flex-wrap items-center gap-2">
         <button
-          className={actionClass}
+          aria-label={label}
+          title={label}
+          className={
+            compact
+              ? "inline-flex size-9 shrink-0 items-center justify-center gap-2 rounded-md text-muted transition-colors enabled:hover:bg-surface enabled:hover:text-brand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:cursor-not-allowed disabled:opacity-30 sm:w-auto sm:px-3"
+              : actionClass
+          }
           disabled={activities.length === 0}
           onClick={download}
           type="button"
         >
-          <Download aria-hidden="true" className="size-4" />
-          {label}
+          <Download aria-hidden="true" className="size-4 shrink-0" />
+          {compact ? <span className="hidden sm:inline">Exportar</span> : label}
         </button>
 
         {googleUrl && (

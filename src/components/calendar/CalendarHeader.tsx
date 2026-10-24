@@ -1,9 +1,10 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 import { AgendaFilters } from "@/components/calendar/AgendaFilters";
+import { CalendarExportActions } from "@/components/calendar/CalendarExportActions";
 import { MonthPicker } from "@/components/calendar/MonthPicker";
-import type { ActivityType } from "@/data/activities";
-import { addDays } from "@/lib/dates";
+import type { Activity, ActivityType } from "@/data/activities";
+import { addDays, dateKey } from "@/lib/dates";
 
 interface CalendarHeaderProps {
   headingId: string;
@@ -12,6 +13,7 @@ interface CalendarHeaderProps {
   firstWeek: Date;
   monthLabel: string;
   selectedTypes: readonly ActivityType[];
+  weekActivities: readonly Activity[];
   onTypeToggle: (type: ActivityType) => void;
   changeWeek: (date: Date) => void;
   goToToday: () => void;
@@ -30,6 +32,7 @@ export function CalendarHeader({
   firstWeek,
   monthLabel,
   selectedTypes,
+  weekActivities,
   onTypeToggle,
   changeWeek,
   goToToday,
@@ -40,7 +43,7 @@ export function CalendarHeader({
 
   return (
     <header className="relative z-30 flex shrink-0 flex-col gap-3 py-4 lg:flex-row lg:items-center lg:justify-between lg:gap-6">
-      <div className="flex min-w-0 items-center justify-between gap-4 sm:justify-start sm:gap-6">
+      <div className="flex min-w-0 items-center justify-between gap-2 sm:justify-start sm:gap-6">
         <div className="min-w-0">
           <h2 id={headingId}>
             <MonthPicker date={addDays(weekStart, 3)} label={monthLabel} onChange={goToMonth} />
@@ -84,6 +87,15 @@ export function CalendarHeader({
           >
             <ChevronRight aria-hidden="true" className="size-4" />
           </button>
+
+          <span aria-hidden="true" className="mx-1 h-4 w-px shrink-0 bg-border" />
+
+          <CalendarExportActions
+            activities={weekActivities}
+            compact
+            filename={`agenda-icci-semana-${dateKey(weekStart)}.ics`}
+            label="Exportar actividades visibles de la semana (.ics)"
+          />
         </div>
       </div>
 

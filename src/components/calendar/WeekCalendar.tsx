@@ -1,6 +1,4 @@
 import { getWeekCalendarModel } from "@/lib/week-calendar-model";
-import { CalendarExportActions } from "@/components/calendar/CalendarExportActions";
-import { dateKey } from "@/lib/dates";
 import { CalendarDaySelector } from "@/components/calendar/CalendarDaySelector";
 import { CalendarGrid } from "@/components/calendar/CalendarGrid";
 import { fullDateFormatter } from "@/components/calendar/calendar-display";
@@ -99,19 +97,12 @@ export function WeekCalendar({
         firstWeek={firstWeek}
         monthLabel={monthLabel}
         selectedTypes={selectedTypes}
+        weekActivities={weekActivities}
         onTypeToggle={onTypeToggle}
         changeWeek={changeWeek}
         goToToday={goToToday}
         goToMonth={goToMonth}
       />
-
-      <div className="mb-3 flex shrink-0 justify-end">
-        <CalendarExportActions
-          activities={weekActivities}
-          filename={`agenda-icci-semana-${dateKey(weekStart)}.ics`}
-          label="Exportar semana (.ics)"
-        />
-      </div>
 
       {showOnlineNotice && <OnlineClassNotice selectedKey={selectedKey} />}
 
