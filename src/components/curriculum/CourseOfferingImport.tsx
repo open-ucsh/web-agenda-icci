@@ -1,3 +1,4 @@
+import { CourseSectionPicker } from "@/components/curriculum/CourseSectionPicker";
 import { useId, useRef, useState } from "react";
 
 import { decodeOfferingFile, parseCourseOfferingReport } from "@/lib/course-offering-import";
@@ -5,9 +6,14 @@ import type { CourseOfferingReport } from "@/types/course-offering";
 
 const MAX_FILE_BYTES = 5 * 1024 * 1024;
 
-export function CourseOfferingImport() {
+interface CourseOfferingImportProps {
+  selectedCodes: readonly string[];
+}
+
+export function CourseOfferingImport({ selectedCodes }: CourseOfferingImportProps) {
   const id = useId();
   const requestRef = useRef(0);
+  const [revision, setRevision] = useState(0);
   const [report, setReport] = useState<CourseOfferingReport | null>(null);
   const [fileName, setFileName] = useState("");
   const [error, setError] = useState("");
@@ -29,6 +35,7 @@ export function CourseOfferingImport() {
       if (request !== requestRef.current) return;
 
       setReport(nextReport);
+      setRevision((current) => current + 1);
       setFileName(file.name);
     } catch (cause) {
       if (request !== requestRef.current) return;
@@ -116,6 +123,8 @@ export function CourseOfferingImport() {
               </ul>
             </details>
           )}
+
+          <CourseSectionPicker key={revision} report={report} selectedCodes={selectedCodes} />
 
           <details className="text-xs">
             <summary className="cursor-pointer font-medium text-brand">

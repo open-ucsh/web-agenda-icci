@@ -111,7 +111,7 @@ export function SemesterPlanner({ progress }: SemesterPlannerProps) {
         </header>
 
         <div className="min-h-0 space-y-5 overflow-y-auto p-5">
-          <CourseOfferingImport />
+          <CourseOfferingImport selectedCodes={draft.selectedCodes} />
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
               <label className="mb-1 block text-xs text-muted" htmlFor={`${id}-period`}>
