@@ -1,5 +1,6 @@
 import { useId, useState } from "react";
 
+import { ScheduleCombinations } from "@/components/curriculum/ScheduleCombinations";
 import { CURRICULUM_COURSES } from "@/data/curriculum";
 import { findSectionConflicts, groupCourseSections } from "@/lib/course-sections";
 import type { CourseOfferingReport } from "@/types/course-offering";
@@ -104,6 +105,18 @@ export function CourseSectionPicker({ report, selectedCodes }: CourseSectionPick
           </fieldset>
         );
       })}
+
+      <ScheduleCombinations
+        key={JSON.stringify([...codes].sort())}
+        sections={sections}
+        selectedCodes={codes}
+        onApply={(combination) => {
+          setChoices((current) => ({
+            ...current,
+            ...Object.fromEntries(combination.map((section) => [section.code, section.id])),
+          }));
+        }}
+      />
 
       {codes.length > 0 && (
         <div aria-live="polite" className="space-y-2 border-t border-border pt-3 text-xs leading-5">
