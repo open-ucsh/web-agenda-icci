@@ -1,5 +1,13 @@
+import { CurriculumCourseDialog } from "@/components/curriculum/CurriculumCourseDialog";
+import { CurriculumProgressSummary } from "@/components/curriculum/CurriculumProgressSummary";
+import { COURSE_PROGRESS_CONFIG, isCourseDisplayStatus } from "@/config/course-progress";
+import { useCurriculumProgress } from "@/hooks/use-curriculum-progress";
+import { getCourseDisplayStatus } from "@/lib/curriculum-progress";
+import type { CurriculumCourse } from "@/types/curriculum";
+import type { CourseDisplayStatus } from "@/types/curriculum-progress";
+
 import { Search } from "lucide-react";
-import { useId, useState } from "react";
+import { useId, useRef, useState } from "react";
 
 import { CurriculumCourseCard } from "@/components/curriculum/CurriculumCourseCard";
 import { CURRICULUM_COURSES, CURRICULUM_PLAN } from "@/data/curriculum";
@@ -7,8 +15,6 @@ import { filterCurriculumCourses, getCourseYear, getCurriculumCredits } from "@/
 import type { CourseKind } from "@/types/curriculum";
 
 const YEARS = Array.from({ length: CURRICULUM_PLAN.years }, (_, index) => index + 1);
-
-const COURSE_NAMES = new Map(CURRICULUM_COURSES.map((course) => [course.code, course.name]));
 
 const TOTAL_CREDITS = getCurriculumCredits(CURRICULUM_COURSES);
 
@@ -21,6 +27,16 @@ export function CurriculumView() {
   const searchId = useId();
   const yearId = useId();
   const kindId = useId();
+  const statusId = useId();
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
+  const [selectedCourse, setSelectedCourse] = useState<CurriculumCourse | null>(null);
+  const [selectedStatus, setSelectedStatus] = useState<CourseDisplayStatus | "all">("all");
+  const { progress, message, setCourseStatus } = useCurriculumProgress();
+
+  function openCourse(course: CurriculumCourse, trigger: HTMLButtonElement): void {
+    triggerRef.current = trigger;
+    setSelectedCourse(course);
+  }
 
   const [query, setQuery] = useState("");
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
@@ -30,18 +46,27 @@ export function CurriculumView() {
     query,
     year: selectedYear,
     kind: selectedKind,
-  });
+  }).filter(
+    (course) =>
+      selectedStatus === "all" ||
+      getCourseDisplayStatus(course, CURRICULUM_COURSES, progress) === selectedStatus,
+  );
 
   const visibleYears = YEARS.filter((year) =>
     courses.some((course) => getCourseYear(course) === year),
   );
 
-  const hasFilters = query.trim() !== "" || selectedYear !== null || selectedKind !== "all";
+  const hasFilters =
+    query.trim() !== "" ||
+    selectedYear !== null ||
+    selectedKind !== "all" ||
+    selectedStatus !== "all";
 
   function clearFilters(): void {
     setQuery("");
     setSelectedYear(null);
     setSelectedKind("all");
+    setSelectedStatus("all");
   }
 
   const controlClass =
@@ -77,6 +102,14 @@ export function CurriculumView() {
           {CURRICULUM_PLAN.years} años
         </p>
       </header>
+
+      <CurriculumProgressSummary progress={progress} />
+
+      {message && (
+        <p role="status" className="mb-3 shrink-0 text-xs leading-5 text-amber-800">
+          {message}
+        </p>
+      )}
 
       <div className="mb-4 flex shrink-0 flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
         <div className="relative min-w-0 flex-1 sm:min-w-60">
@@ -144,6 +177,32 @@ export function CurriculumView() {
               <option value="required">Obligatorios</option>
               <option value="elective">Optativos</option>
               <option value="general">Formación general</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="sr-only" htmlFor={statusId}>
+              Filtrar por estado
+            </label>
+
+            <select
+              className={`${controlClass} w-full`}
+              id={statusId}
+              onChange={(event) => {
+                const value = event.currentTarget.value;
+
+                if (value === "all" || isCourseDisplayStatus(value)) {
+                  setSelectedStatus(value);
+                }
+              }}
+              value={selectedStatus}
+            >
+              <option value="all">Todos los estados</option>
+              {Object.entries(COURSE_PROGRESS_CONFIG).map(([value, config]) => (
+                <option key={value} value={value}>
+                  {config.label}
+                </option>
+              ))}
             </select>
           </div>
         </div>
@@ -218,9 +277,12 @@ export function CurriculumView() {
                             <li key={course.code}>
                               <CurriculumCourseCard
                                 course={course}
-                                prerequisiteNames={course.prerequisites.map(
-                                  (code) => COURSE_NAMES.get(code) ?? code,
+                                status={getCourseDisplayStatus(
+                                  course,
+                                  CURRICULUM_COURSES,
+                                  progress,
                                 )}
+                                onOpen={openCourse}
                               />
                             </li>
                           ))}
@@ -246,6 +308,14 @@ export function CurriculumView() {
           </button>
         </div>
       )}
+
+      <CurriculumCourseDialog
+        course={selectedCourse}
+        progress={progress}
+        triggerRef={triggerRef}
+        onClose={() => setSelectedCourse(null)}
+        onStatusChange={setCourseStatus}
+      />
 
       <footer className="shrink-0 py-3 text-xs leading-5 text-muted">
         Fuente: Plan de Estudios ICCI UCSH {CURRICULUM_PLAN.year}, Plan N.º {CURRICULUM_PLAN.number}
