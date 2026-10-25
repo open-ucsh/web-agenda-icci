@@ -1,3 +1,5 @@
+import { ScheduleApply } from "@/components/curriculum/ScheduleApply";
+import type { PersonalSchedule } from "@/lib/personal-agenda";
 import type { CurriculumCourse } from "@/types/curriculum";
 import { ArrowLeft, ChevronLeft, ChevronRight, FileUp, Search } from "lucide-react";
 import { useId, useRef, useState } from "react";
@@ -19,6 +21,7 @@ import type { CurriculumProgress } from "@/types/curriculum-progress";
 interface SemesterPlannerProps {
   progress: CurriculumProgress;
   onBack: () => void;
+  onUseSchedule: (schedule: PersonalSchedule) => void;
   onEditCourse: (course: CurriculumCourse, trigger: HTMLButtonElement) => void;
 }
 
@@ -45,7 +48,12 @@ function isException(value: string): value is MinimumLoadException {
   return value === "none" || value === "last-semester" || value === "insufficient-offer";
 }
 
-export function SemesterPlanner({ progress, onBack, onEditCourse }: SemesterPlannerProps) {
+export function SemesterPlanner({
+  progress,
+  onBack,
+  onEditCourse,
+  onUseSchedule,
+}: SemesterPlannerProps) {
   const id = useId();
   const inputRef = useRef<HTMLInputElement>(null);
   const requestRef = useRef(0);
@@ -498,6 +506,14 @@ export function SemesterPlanner({ progress, onBack, onEditCourse }: SemesterPlan
           )}
 
           <footer className="mt-3 flex shrink-0 flex-wrap items-center justify-between gap-3 border-t border-border py-3">
+            {combination.length > 0 && report && (
+              <ScheduleApply
+                key={String(imported?.revision)}
+                onUse={onUseSchedule}
+                reportPeriod={report.period}
+                sections={combination}
+              />
+            )}
             <p className="text-xs text-muted">El horario no modifica tu avance</p>
             <button
               className={outlineButton}

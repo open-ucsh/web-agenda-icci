@@ -1,8 +1,9 @@
+import { usePersonalAgenda } from "@/hooks/use-personal-agenda";
+import { composeWeekAgenda, getPersonalWeekActivities } from "@/lib/personal-agenda";
+import { HOLIDAYS } from "@/data/activities";
 import { SemesterPlannerPage } from "@/components/curriculum/SemesterPlannerPage";
 import { CurriculumView } from "@/components/curriculum/CurriculumView";
 import { useAppView } from "@/hooks/use-app-view";
-
-import { ACTIVITY_TYPES } from "@/config/activity-types";
 
 import { useState } from "react";
 
@@ -23,15 +24,23 @@ function formatDate(value: string): string {
 
 export default function App() {
   const view = useAppView();
+  const {
+    data: personalAgenda,
+    message: agendaMessage,
+    saveSchedule,
+    setSelectedTypes,
+    setOnlyFree,
+  } = usePersonalAgenda();
+  const selectedTypes = personalAgenda.selectedTypes;
   const [selectedPeriod, setSelectedPeriod] = useState<string>(PERIODS[0]?.id ?? "");
-
-  const [selectedTypes, setSelectedTypes] = useState<ActivityType[]>(() => [...ACTIVITY_TYPES]);
 
   const [weekStart, setWeekStart] = useState(() => clampWeek(getSantiagoDate()));
 
   function toggleActivityType(type: ActivityType): void {
-    setSelectedTypes((current) =>
-      current.includes(type) ? current.filter((item) => item !== type) : [...current, type],
+    setSelectedTypes(
+      selectedTypes.includes(type)
+        ? selectedTypes.filter((item) => item !== type)
+        : [...selectedTypes, type],
     );
   }
 
@@ -39,8 +48,15 @@ export default function App() {
     setWeekStart(clampWeek(date));
   }
 
-  const filteredActivities = getWeekActivities(weekStart, selectedPeriod).filter((activity) =>
-    selectedTypes.includes(activity.type),
+  const personalSchedule = personalAgenda.schedules.find(
+    (schedule) => schedule.periodId === selectedPeriod,
+  );
+  const personalClasses = getPersonalWeekActivities(personalSchedule, weekStart, HOLIDAYS);
+  const filteredActivities = composeWeekAgenda(
+    getWeekActivities(weekStart, selectedPeriod),
+    personalClasses,
+    selectedTypes,
+    personalAgenda.onlyFree,
   );
 
   const weekEnd = addDays(weekStart, 6);
@@ -79,6 +95,29 @@ export default function App() {
         className="mx-auto flex min-h-0 w-full max-w-screen-2xl flex-1 flex-col px-4 pb-3 sm:px-6 lg:px-8"
       >
         <div className={view === "agenda" ? "flex min-h-0 flex-1 flex-col" : "hidden"}>
+          {agendaMessage && (
+            <p className="shrink-0 pt-3 text-xs text-amber-800" role="status">
+              {agendaMessage}
+            </p>
+          )}
+
+          {personalSchedule && (
+            <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-border py-2 text-xs">
+              <p className="text-muted">
+                Horario personal · {personalSchedule.validFrom} a {personalSchedule.validUntil}
+              </p>
+              <label className="flex items-center gap-2">
+                <input
+                  checked={personalAgenda.onlyFree}
+                  className="size-4 accent-brand"
+                  onChange={(event) => setOnlyFree(event.currentTarget.checked)}
+                  type="checkbox"
+                />
+                Solo actividades sin topes con mis clases
+              </label>
+            </div>
+          )}
+
           <WeekCalendar
             activities={filteredActivities}
             onTypeToggle={toggleActivityType}
@@ -94,7 +133,21 @@ export default function App() {
         </div>
 
         <div className={view === "planner" ? "flex min-h-0 flex-1 flex-col" : "hidden"}>
-          <SemesterPlannerPage />
+          <SemesterPlannerPage
+            onUseSchedule={(schedule) => {
+              saveSchedule(schedule);
+              setSelectedPeriod(schedule.periodId);
+              const today = dateKey(getSantiagoDate());
+              const target =
+                today < schedule.validFrom
+                  ? schedule.validFrom
+                  : today > schedule.validUntil
+                    ? schedule.validUntil
+                    : today;
+              setWeekStart(clampWeek(parseDateKey(target)));
+              window.location.hash = "#agenda";
+            }}
+          />
         </div>
 
         {view === "agenda" && (

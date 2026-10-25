@@ -1,3 +1,4 @@
+import type { PersonalSchedule } from "@/lib/personal-agenda";
 import { useRef, useState } from "react";
 
 import { CurriculumCourseDialog } from "@/components/curriculum/CurriculumCourseDialog";
@@ -5,7 +6,11 @@ import { SemesterPlanner } from "@/components/curriculum/SemesterPlanner";
 import { useCurriculumProgress } from "@/hooks/use-curriculum-progress";
 import type { CurriculumCourse } from "@/types/curriculum";
 
-export function SemesterPlannerPage() {
+interface SemesterPlannerPageProps {
+  onUseSchedule: (schedule: PersonalSchedule) => void;
+}
+
+export function SemesterPlannerPage({ onUseSchedule }: SemesterPlannerPageProps) {
   const { progress, message, setCourseStatus } = useCurriculumProgress();
   const [course, setCourse] = useState<CurriculumCourse | null>(null);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
@@ -19,6 +24,7 @@ export function SemesterPlannerPage() {
       )}
 
       <SemesterPlanner
+        onUseSchedule={onUseSchedule}
         onBack={() => {
           window.location.hash = "#malla";
         }}
