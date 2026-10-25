@@ -67,6 +67,7 @@ export function Navbar({ periods, selectedPeriod, onPeriodChange, view }: Navbar
           {[
             { id: "agenda", href: "#agenda", label: "Mi agenda" },
             { id: "curriculum", href: "#malla", label: "Mi malla" },
+            { id: "planner", href: "#semestre", label: "Armar semestre" },
           ].map((item) => (
             <a
               aria-current={view === item.id ? "page" : undefined}

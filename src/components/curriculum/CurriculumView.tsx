@@ -1,4 +1,3 @@
-import { SemesterPlanner } from "@/components/curriculum/SemesterPlanner";
 import { ChevronLeft, ChevronRight, Search } from "lucide-react";
 import { useId, useRef, useState } from "react";
 
@@ -105,7 +104,6 @@ export function CurriculumView() {
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          <SemesterPlanner progress={progress} />
           <div className="relative">
             <label className="sr-only" htmlFor={`${id}-search`}>
               Buscar ramo

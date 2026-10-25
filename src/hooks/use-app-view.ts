@@ -1,9 +1,16 @@
 import { useEffect, useState } from "react";
 
-export type AppView = "agenda" | "curriculum";
+export type AppView = "agenda" | "curriculum" | "planner";
 
 function readAppView(): AppView {
-  return window.location.hash === "#malla" ? "curriculum" : "agenda";
+  switch (window.location.hash) {
+    case "#malla":
+      return "curriculum";
+    case "#semestre":
+      return "planner";
+    default:
+      return "agenda";
+  }
 }
 
 export function useAppView(): AppView {
@@ -15,6 +22,7 @@ export function useAppView(): AppView {
     }
 
     window.addEventListener("hashchange", handleHashChange);
+    handleHashChange();
 
     return () => {
       window.removeEventListener("hashchange", handleHashChange);

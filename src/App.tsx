@@ -1,3 +1,4 @@
+import { SemesterPlannerPage } from "@/components/curriculum/SemesterPlannerPage";
 import { CurriculumView } from "@/components/curriculum/CurriculumView";
 import { useAppView } from "@/hooks/use-app-view";
 
@@ -68,7 +69,13 @@ export default function App() {
       />
 
       <main
-        aria-label={view === "curriculum" ? "Malla curricular" : "Agenda de apoyo académico"}
+        aria-label={
+          view === "curriculum"
+            ? "Malla curricular"
+            : view === "planner"
+              ? "Planificación del semestre"
+              : "Agenda de apoyo académico"
+        }
         className="mx-auto flex min-h-0 w-full max-w-screen-2xl flex-1 flex-col px-4 pb-3 sm:px-6 lg:px-8"
       >
         <div className={view === "agenda" ? "flex min-h-0 flex-1 flex-col" : "hidden"}>
@@ -82,7 +89,13 @@ export default function App() {
           />
         </div>
 
-        {view === "curriculum" && <CurriculumView />}
+        <div className={view === "curriculum" ? "flex min-h-0 flex-1 flex-col" : "hidden"}>
+          <CurriculumView />
+        </div>
+
+        <div className={view === "planner" ? "flex min-h-0 flex-1 flex-col" : "hidden"}>
+          <SemesterPlannerPage />
+        </div>
 
         {view === "agenda" && (
           <footer className="hidden shrink-0 items-center justify-between gap-4 pt-3 text-xs leading-5 text-muted md:flex">
