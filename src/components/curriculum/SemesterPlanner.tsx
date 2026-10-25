@@ -1,6 +1,7 @@
 import { ClipboardList, X } from "lucide-react";
 import { useId, useRef, useState } from "react";
 
+import { CourseOfferingImport } from "@/components/curriculum/CourseOfferingImport";
 import { Dialog } from "@/components/ui/Dialog";
 import { PERIODS } from "@/data/activities";
 import { CURRICULUM_COURSES } from "@/data/curriculum";
@@ -110,6 +111,7 @@ export function SemesterPlanner({ progress }: SemesterPlannerProps) {
         </header>
 
         <div className="min-h-0 space-y-5 overflow-y-auto p-5">
+          <CourseOfferingImport />
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
               <label className="mb-1 block text-xs text-muted" htmlFor={`${id}-period`}>
