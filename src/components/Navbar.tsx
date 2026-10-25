@@ -1,3 +1,5 @@
+import type { AppView } from "@/hooks/use-app-view";
+
 import { Dialog } from "@/components/ui/Dialog";
 
 import { CalendarDays, ChevronDown, CircleHelp, X } from "lucide-react";
@@ -11,12 +13,13 @@ export interface AcademicPeriod {
 }
 
 interface NavbarProps {
+  view: AppView;
   periods: readonly AcademicPeriod[];
   selectedPeriod: string;
   onPeriodChange: (periodId: string) => void;
 }
 
-export function Navbar({ periods, selectedPeriod, onPeriodChange }: NavbarProps) {
+export function Navbar({ periods, selectedPeriod, onPeriodChange, view }: NavbarProps) {
   const periodId = useId();
   const helpTitleId = useId();
   const helpRef = useRef<HTMLDialogElement>(null);
@@ -58,17 +61,31 @@ export function Navbar({ periods, selectedPeriod, onPeriodChange }: NavbarProps)
 
         <div
           aria-label="Secciones de la agenda"
-          className="hidden h-16 items-center gap-3 lg:flex"
+          className="order-last flex h-11 items-center gap-4 border-t border-border lg:order-none lg:h-16 lg:border-0"
           role="group"
         >
-          <span
-            aria-current="page"
-            className="flex h-full items-center border-b-2 border-brand px-1 text-sm font-semibold text-brand"
-          >
-            Calendario
-          </span>
+          {[
+            { id: "agenda", href: "#agenda", label: "Mi agenda" },
+            { id: "curriculum", href: "#malla", label: "Mi malla" },
+          ].map((item) => (
+            <a
+              aria-current={view === item.id ? "page" : undefined}
+              className={[
+                "flex h-full items-center border-b-2 px-1 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand",
+                view === item.id
+                  ? "border-brand font-semibold text-brand"
+                  : "border-transparent text-muted hover:text-brand",
+              ].join(" ")}
+              href={item.href}
+              key={item.id}
+            >
+              {item.label}
+            </a>
+          ))}
 
-          <AcademicDates periodId={selectedPeriod} />
+          <div className="hidden lg:block">
+            <AcademicDates periodId={selectedPeriod} />
+          </div>
         </div>
 
         <div className="flex min-w-0 items-center gap-2 border-t border-border py-2 lg:ml-auto lg:border-0 lg:py-0">

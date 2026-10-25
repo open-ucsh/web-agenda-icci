@@ -1,3 +1,6 @@
+import { CurriculumView } from "@/components/curriculum/CurriculumView";
+import { useAppView } from "@/hooks/use-app-view";
+
 import { ACTIVITY_TYPES } from "@/config/activity-types";
 
 import { useState } from "react";
@@ -18,6 +21,7 @@ function formatDate(value: string): string {
 }
 
 export default function App() {
+  const view = useAppView();
   const [selectedPeriod, setSelectedPeriod] = useState<string>(PERIODS[0]?.id ?? "");
 
   const [selectedTypes, setSelectedTypes] = useState<ActivityType[]>(() => [...ACTIVITY_TYPES]);
@@ -57,47 +61,54 @@ export default function App() {
   return (
     <div className="flex h-dvh flex-col overflow-hidden bg-background text-text">
       <Navbar
+        view={view}
         onPeriodChange={setSelectedPeriod}
         periods={PERIODS}
         selectedPeriod={selectedPeriod}
       />
 
       <main
-        aria-label="Agenda de apoyo académico"
+        aria-label={view === "curriculum" ? "Malla curricular" : "Agenda de apoyo académico"}
         className="mx-auto flex min-h-0 w-full max-w-screen-2xl flex-1 flex-col px-4 pb-3 sm:px-6 lg:px-8"
       >
-        <WeekCalendar
-          activities={filteredActivities}
-          onTypeToggle={toggleActivityType}
-          onWeekChange={changeWeek}
-          periodId={selectedPeriod}
-          selectedTypes={selectedTypes}
-          weekStart={weekStart}
-        />
+        <div className={view === "agenda" ? "flex min-h-0 flex-1 flex-col" : "hidden"}>
+          <WeekCalendar
+            activities={filteredActivities}
+            onTypeToggle={toggleActivityType}
+            onWeekChange={changeWeek}
+            periodId={selectedPeriod}
+            selectedTypes={selectedTypes}
+            weekStart={weekStart}
+          />
+        </div>
 
-        <footer className="hidden shrink-0 items-center justify-between gap-4 pt-3 text-xs leading-5 text-muted md:flex">
-          <p className="min-w-0 truncate">
-            {milestone ? (
-              <>
-                <span className="font-medium text-text">{milestone.title}</span>
-                {" · "}
-                {formatDate(milestone.startsOn)}
-                {milestone.endsOn !== milestone.startsOn && ` – ${formatDate(milestone.endsOn)}`}
-              </>
-            ) : (
-              "Sin próximos hitos destacados"
-            )}
-          </p>
+        {view === "curriculum" && <CurriculumView />}
 
-          <a
-            className="shrink-0 rounded transition-colors hover:text-brand focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand"
-            href="https://github.com/open-ucsh"
-            rel="noreferrer"
-            target="_blank"
-          >
-            Open UCSH
-          </a>
-        </footer>
+        {view === "agenda" && (
+          <footer className="hidden shrink-0 items-center justify-between gap-4 pt-3 text-xs leading-5 text-muted md:flex">
+            <p className="min-w-0 truncate">
+              {milestone ? (
+                <>
+                  <span className="font-medium text-text">{milestone.title}</span>
+                  {" · "}
+                  {formatDate(milestone.startsOn)}
+                  {milestone.endsOn !== milestone.startsOn && ` – ${formatDate(milestone.endsOn)}`}
+                </>
+              ) : (
+                "Sin próximos hitos destacados"
+              )}
+            </p>
+
+            <a
+              className="shrink-0 rounded transition-colors hover:text-brand focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand"
+              href="https://github.com/open-ucsh"
+              rel="noreferrer"
+              target="_blank"
+            >
+              Open UCSH
+            </a>
+          </footer>
+        )}
       </main>
     </div>
   );
