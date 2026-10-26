@@ -1,4 +1,4 @@
-export type ActivityType = "pace" | "mentoring" | "tutoring" | "workshop";
+export type ActivityType = "class" | "pace" | "mentoring" | "tutoring" | "workshop";
 
 export interface Activity {
   id: string;

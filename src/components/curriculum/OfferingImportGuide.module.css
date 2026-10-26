@@ -1,0 +1,387 @@
+.root {
+  min-height: 0;
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: clamp(1.5rem, 4vh, 3rem) 0 1.5rem;
+}
+
+.content {
+  width: 100%;
+  max-width: 72rem;
+  margin: 0 auto;
+}
+
+.header {
+  margin-bottom: 1.75rem;
+  text-align: center;
+}
+
+.title {
+  color: var(--color-brand);
+  font-size: clamp(1.5rem, 2.5vw, 2rem);
+  font-weight: 650;
+  letter-spacing: -0.03em;
+}
+
+.subtitle {
+  margin-top: 0.5rem;
+  color: var(--color-muted);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+}
+
+.panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(17rem, 1fr);
+  overflow: hidden;
+  border: 1px solid #b8c7d8;
+  border-radius: 0.5rem;
+  background: var(--color-background);
+}
+
+.guide {
+  padding: clamp(1.5rem, 3vw, 2rem);
+}
+
+.sectionTitle {
+  color: var(--color-brand);
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.step {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.875rem;
+}
+
+.number {
+  display: grid;
+  width: 1.75rem;
+  height: 1.75rem;
+  flex-shrink: 0;
+  place-items: center;
+  border-radius: 50%;
+  background: #edf2f8;
+  color: var(--color-brand);
+  font-size: 0.8125rem;
+  font-weight: 650;
+}
+
+.stepContent {
+  min-width: 0;
+  flex: 1;
+}
+
+.stepTitle {
+  padding-top: 0.1rem;
+  color: var(--color-brand);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.description {
+  margin-top: 0.3rem;
+  color: var(--color-muted);
+  font-size: 0.8125rem;
+  line-height: 1.65;
+}
+
+.description strong {
+  color: var(--color-text);
+  font-weight: 550;
+}
+
+.path {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.375rem;
+  padding: 0.75rem;
+  color: var(--color-text);
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+.path svg {
+  width: 0.875rem;
+  height: 0.875rem;
+  flex-shrink: 0;
+  color: var(--color-muted);
+}
+
+.path strong {
+  color: var(--color-brand);
+  font-weight: 550;
+}
+
+.selection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-top: 0.75rem;
+  border-left: 3px solid #2563eb;
+  padding: 0.65rem 0 0.65rem 1rem;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+.selection > div {
+  display: grid;
+  grid-template-columns: 4rem minmax(0, 1fr);
+  gap: 0.75rem;
+}
+
+.selection dt {
+  color: var(--color-muted);
+  font-size: 0.75rem;
+}
+
+.selection dd {
+  color: var(--color-text);
+}
+
+.exportHint {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  color: var(--color-brand);
+  font-size: 0.75rem;
+  line-height: 1.6;
+}
+
+.exportHint svg {
+  width: 1rem;
+  height: 1rem;
+  margin-top: 0.05rem;
+  flex-shrink: 0;
+}
+
+.upload {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-left: 1px solid var(--color-border);
+  background: #fafbfd;
+  padding: 2rem;
+}
+
+.uploadContent {
+  width: 100%;
+  max-width: 18rem;
+  text-align: center;
+}
+
+.fileIcon {
+  position: relative;
+  width: 3.5rem;
+  margin: 0 auto 1.5rem;
+  color: var(--color-brand);
+}
+
+.fileIcon > svg {
+  width: 3.5rem;
+  height: 4rem;
+  stroke-width: 1.25;
+}
+
+.fileIcon > span {
+  position: absolute;
+  right: -0.25rem;
+  bottom: 0.1rem;
+  border-radius: 0.2rem;
+  background: var(--color-brand);
+  padding: 0.15rem 0.35rem;
+  color: white;
+  font-size: 0.65rem;
+  font-weight: 650;
+}
+
+.uploadTitle {
+  color: var(--color-brand);
+  font-size: 1.3rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.uploadDescription {
+  margin-top: 0.75rem;
+  color: var(--color-muted);
+  font-size: 0.875rem;
+  line-height: 1.65;
+}
+
+.uploadButton {
+  display: inline-flex;
+  width: 100%;
+  min-height: 2.875rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.625rem;
+  margin-top: 1.75rem;
+  border-radius: 0.375rem;
+  background: var(--color-brand);
+  padding: 0.75rem 1rem;
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 550;
+}
+
+.uploadButton:hover {
+  background: var(--color-brand-hover);
+}
+
+.uploadButton:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 4px;
+}
+
+.uploadButton:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.uploadButton svg {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+.format {
+  margin-top: 0.75rem;
+  color: var(--color-muted);
+  font-size: 0.75rem;
+}
+
+.footer {
+  display: flex;
+  grid-column: 1 / -1;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+  border-top: 1px solid var(--color-border);
+  padding: 1rem 1.5rem;
+  color: var(--color-muted);
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+.footer p {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.footer svg {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+}
+
+.flow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem 1.5rem;
+  margin-top: 1.5rem;
+  color: var(--color-muted);
+  font-size: 0.75rem;
+}
+
+.flow li {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.flow li > span {
+  display: grid;
+  width: 1.75rem;
+  height: 1.75rem;
+  flex-shrink: 0;
+  place-items: center;
+  border-radius: 50%;
+  background: #edf2f8;
+}
+
+.flow li > .currentNumber {
+  background: var(--color-brand);
+  color: white;
+}
+
+.flow strong {
+  color: var(--color-brand);
+  font-weight: 550;
+}
+
+.arrow svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+@media (max-width: 767px) {
+  .panel {
+    grid-template-columns: 1fr;
+  }
+
+  .upload {
+    grid-row: 1;
+    border-bottom: 1px solid var(--color-border);
+    border-left: 0;
+    padding: 1.75rem 1.25rem;
+  }
+
+  .fileIcon {
+    margin-bottom: 1rem;
+  }
+
+  .uploadButton {
+    margin-top: 1.25rem;
+  }
+
+  .guide {
+    padding: 1.5rem 1.25rem;
+  }
+
+  .footer {
+    padding: 1rem 1.25rem;
+  }
+
+  .flow {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding-left: 0.25rem;
+  }
+
+  .flow .arrow {
+    display: none;
+  }
+}
+
+@media (max-width: 399px) {
+  .selection > div {
+    grid-template-columns: 1fr;
+    gap: 0.15rem;
+  }
+
+  .path {
+    gap: 0.35rem;
+    font-size: 0.6875rem;
+  }
+}

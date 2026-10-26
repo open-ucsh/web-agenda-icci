@@ -1,39 +1,95 @@
+import { Link2 } from "lucide-react";
+
 import { ACTIVITY_TYPE_CONFIG } from "@/config/activity-types";
+import { getCourseAppearance } from "@/config/course-appearance";
 import { COURSES } from "@/data/activities";
-import type { Activity } from "@/types/activity";
+import { CURRICULUM_COURSES } from "@/data/curriculum";
+import type { Activity, ActivityType } from "@/types/activity";
+
+import styles from "./AgendaCalendar.module.css";
 
 interface ActivityCardProps {
   activity: Activity;
   onOpen: (activity: Activity, trigger: HTMLButtonElement) => void;
 }
 
+const SUPPORT_COLORS = {
+  pace: { accent: "#b54a72", background: "#fbeef3" },
+  mentoring: { accent: "#087f8c", background: "#eaf6f5" },
+  tutoring: { accent: "#a67516", background: "#fcf5e7" },
+  workshop: { accent: "#2563eb", background: "#edf3ff" },
+} satisfies Record<Exclude<ActivityType, "class">, { accent: string; background: string }>;
+
+const CURRICULUM = new Map(CURRICULUM_COURSES.map((course) => [course.code, course]));
+
 export function ActivityCard({ activity, onOpen }: ActivityCardProps) {
   const category = ACTIVITY_TYPE_CONFIG[activity.type];
+  const isClass = activity.type === "class";
+  const code = activity.courseId.startsWith("personal:")
+    ? activity.courseId.slice("personal:".length)
+    : activity.courseId;
+  const course = isClass ? CURRICULUM.get(code) : undefined;
 
-  const fullName =
-    COURSES.find((course) => course.id === activity.courseId)?.name ?? activity.title;
+  const fullName = COURSES.find((item) => item.id === activity.courseId)?.name ?? activity.title;
+  const title = isClass
+    ? (course?.name ?? activity.title.split(" · ")[0] ?? activity.title)
+    : activity.type === "workshop"
+      ? (fullName.split(" · ")[0] ?? fullName)
+      : fullName;
 
-  const title = activity.type === "workshop" ? (fullName.split(" · ")[0] ?? fullName) : fullName;
+  const section = isClass ? /(?:^|·)\s*S([^·\s]+)/.exec(activity.title)?.[1] : undefined;
+  const appearance =
+    activity.type === "class" ? getCourseAppearance(code) : SUPPORT_COLORS[activity.type];
+  const hasPrerequisites = (course?.prerequisites.length ?? 0) > 0;
+  const metadata = isClass
+    ? [section ? `S${section}` : "", activity.location].filter(Boolean).join(" · ")
+    : activity.location;
 
-  const responsibleName = activity.mentor.replace(/^(Estudiante|Profesor|Tallerista)\s+/, "");
+  const description = [
+    title,
+    category.label,
+    `${activity.startTime}–${activity.endTime}`,
+    metadata,
+    activity.mentor,
+    hasPrerequisites ? "Ramo con prerrequisitos" : "",
+  ]
+    .filter(Boolean)
+    .join(" · ");
 
   return (
     <button
       aria-haspopup="dialog"
-      aria-label={`${fullName}, ${category.label}, ${activity.startTime} a ${activity.endTime}, ${activity.mentor}. Ver detalles.`}
-      className={[
-        "flex h-full w-full min-w-0 flex-col gap-1 overflow-hidden rounded-sm border border-l-2 px-2.5 py-2 text-left transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-brand motion-reduce:transition-none",
-        category.card,
-      ].join(" ")}
+      aria-label={`${description}. Ver detalles.`}
+      className={[styles.card, isClass ? "" : styles.support].join(" ")}
       onClick={(event) => onOpen(activity, event.currentTarget)}
-      title={`${fullName} · ${category.label} · ${activity.startTime}–${activity.endTime} · ${activity.mentor}`}
+      style={{
+        backgroundColor: isClass ? appearance.background : "#ffffff",
+        borderColor: appearance.accent,
+      }}
+      title={description}
       type="button"
     >
-      <span className="line-clamp-2 w-full shrink-0 text-xs font-semibold leading-4">{title}</span>
+      {!isClass && (
+        <span
+          className={styles.category}
+          style={{ backgroundColor: appearance.background, color: appearance.accent }}
+        >
+          {category.label}
+        </span>
+      )}
 
-      <span className="block w-full shrink-0 truncate text-xs leading-4 opacity-80">
-        {responsibleName}
+      <span className={styles.cardHeading}>
+        <span className={styles.cardTitle}>{title}</span>
+        {hasPrerequisites && (
+          <Link2 aria-hidden="true" className={styles.chain} style={{ color: appearance.accent }} />
+        )}
       </span>
+
+      <span className={styles.cardTime}>
+        {activity.startTime}–{activity.endTime}
+      </span>
+
+      <span className={styles.cardMeta}>{metadata}</span>
     </button>
   );
 }

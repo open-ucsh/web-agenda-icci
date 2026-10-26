@@ -1,3 +1,4 @@
+import { formatResponsibleNames } from "@/lib/responsible-names";
 import { Dialog } from "@/components/ui/Dialog";
 import { CalendarExportActions } from "@/components/calendar/CalendarExportActions";
 
@@ -115,7 +116,7 @@ export function ActivityDetails({
                   <dt className="text-xs text-muted">Responsable</dt>
 
                   <dd className="mt-1 text-sm font-medium leading-6 wrap-break-word">
-                    {activity.mentor}
+                    {formatResponsibleNames(activity.mentor)}
                   </dd>
                 </div>
               </div>
