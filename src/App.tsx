@@ -1,4 +1,5 @@
 import { usePersonalAgenda } from "@/hooks/use-personal-agenda";
+import { useCurriculumProgress } from "@/hooks/use-curriculum-progress";
 import { composeWeekAgenda, getPersonalWeekActivities } from "@/lib/personal-agenda";
 import { HOLIDAYS } from "@/data/activities";
 import { SemesterPlannerPage } from "@/components/curriculum/SemesterPlannerPage";
@@ -24,12 +25,12 @@ function formatDate(value: string): string {
 
 export default function App() {
   const view = useAppView();
+  const { markScheduleCoursesInProgress } = useCurriculumProgress();
   const {
     data: personalAgenda,
     message: agendaMessage,
     saveSchedule,
     setSelectedTypes,
-    setOnlyFree,
   } = usePersonalAgenda();
   const selectedTypes = personalAgenda.selectedTypes;
   const [selectedPeriod, setSelectedPeriod] = useState<string>(PERIODS[0]?.id ?? "");
@@ -56,7 +57,7 @@ export default function App() {
     getWeekActivities(weekStart, selectedPeriod),
     personalClasses,
     selectedTypes,
-    personalAgenda.onlyFree,
+    true,
   );
 
   const weekEnd = addDays(weekStart, 6);
@@ -101,23 +102,6 @@ export default function App() {
             </p>
           )}
 
-          {personalSchedule && (
-            <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-border py-2 text-xs">
-              <p className="text-muted">
-                Horario personal · {personalSchedule.validFrom} a {personalSchedule.validUntil}
-              </p>
-              <label className="flex items-center gap-2">
-                <input
-                  checked={personalAgenda.onlyFree}
-                  className="size-4 accent-brand"
-                  onChange={(event) => setOnlyFree(event.currentTarget.checked)}
-                  type="checkbox"
-                />
-                Solo actividades sin topes con mis clases
-              </label>
-            </div>
-          )}
-
           <WeekCalendar
             activities={filteredActivities}
             onTypeToggle={toggleActivityType}
@@ -135,6 +119,7 @@ export default function App() {
         <div className={view === "planner" ? "flex min-h-0 flex-1 flex-col" : "hidden"}>
           <SemesterPlannerPage
             onUseSchedule={(schedule) => {
+              markScheduleCoursesInProgress(schedule.entries.map((entry) => entry.courseCode));
               saveSchedule(schedule);
               setSelectedPeriod(schedule.periodId);
               const today = dateKey(getSantiagoDate());

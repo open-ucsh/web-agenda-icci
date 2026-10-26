@@ -1,10 +1,11 @@
+import { ACADEMIC_DAY_START, ACADEMIC_DAY_END } from "@/config/academic-blocks";
 import { getDateInTimezone, parseDateKey, startOfWeek } from "@/lib/dates";
 
 export const AGENDA_CONFIG = {
   timezone: "America/Santiago",
   firstAvailableDate: "2026-10-01",
-  defaultStartHour: 9,
-  defaultEndHour: 19,
+  defaultStartHour: ACADEMIC_DAY_START / 60,
+  defaultEndHour: ACADEMIC_DAY_END / 60,
 } as const;
 
 export function getFirstAvailableDate(): Date {

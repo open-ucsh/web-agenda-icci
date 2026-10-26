@@ -100,10 +100,9 @@ describe("getWeekCalendarModel", () => {
       activity({ id: "late", startTime: "19:30", endTime: "20:15" }),
     ]);
 
-    expect(result.startHour).toBe(8);
-    expect(result.endHour).toBe(21);
-    expect(result.hours).toHaveLength(13);
-    expect(result.hours[0]).toBe(8);
-    expect(result.hours.at(-1)).toBe(20);
+    expect(result.startHour).toBe(8.5);
+    expect(result.endHour).toBe(20.25);
+    expect(result.calendarHeight).toBeCloseTo(846);
+    expect(result.hours).toEqual([8.5, 10, 11.5, 13, 15 + 20 / 60, 16 + 50 / 60, 18 + 10 / 60]);
   });
 });

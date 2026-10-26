@@ -99,18 +99,48 @@ function setCourseStatus(code: string, status: CourseProgressStatus | null): voi
   }
 
   if (
-    status === "in-progress" &&
+    (status === "in-progress" || status === "approved") &&
     !getCourseRequirements(course, CURRICULUM_COURSES, current.progress).eligible
   ) {
     snapshot = {
       ...current,
-      message: "Debes cumplir los prerrequisitos para marcar este ramo como cursando.",
+      message: "Debes cumplir los prerrequisitos antes de aprobar o cursar este ramo.",
     };
     notify();
     return;
   }
 
   const progress = updateCourseProgress(current.progress, code, status);
+
+  const invalidatedCourse = CURRICULUM_COURSES.find((item) => {
+    const recorded = progress[item.code];
+
+    if (item.code === code || (recorded !== "approved" && recorded !== "in-progress")) {
+      return false;
+    }
+
+    const previouslyEligible = getCourseRequirements(
+      item,
+      CURRICULUM_COURSES,
+      current.progress,
+    ).eligible;
+
+    const remainsEligible = getCourseRequirements(item, CURRICULUM_COURSES, progress).eligible;
+
+    return previouslyEligible && !remainsEligible;
+  });
+
+  if (invalidatedCourse) {
+    snapshot = {
+      ...current,
+      message:
+        `Primero cambia el estado de ${invalidatedCourse.name}. ` +
+        "Este cambio dejaría sus requisitos sin cumplir.",
+    };
+    notify();
+    return;
+  }
+
   let message: string | null = null;
 
   try {
@@ -123,11 +153,52 @@ function setCourseStatus(code: string, status: CourseProgressStatus | null): voi
   notify();
 }
 
+function markScheduleCoursesInProgress(codes: readonly string[]): void {
+  const current = getSnapshot();
+  let progress = current.progress;
+
+  for (const code of new Set(codes)) {
+    const course = CURRICULUM_COURSES.find((item) => item.code === code);
+
+    // La oferta puede incluir ramos que no pertenecen a este plan.
+    if (!course || current.progress[code] === "approved") {
+      continue;
+    }
+
+    if (!getCourseRequirements(course, CURRICULUM_COURSES, current.progress).eligible) {
+      throw new Error(
+        `No se pudo aplicar el horario: revisa los prerrequisitos de ${course.name} en Mi malla.`,
+      );
+    }
+
+    if (progress[code] !== "in-progress") {
+      progress = updateCourseProgress(progress, code, "in-progress");
+    }
+  }
+
+  if (progress === current.progress) {
+    return;
+  }
+
+  let message: string | null = null;
+
+  try {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ version: 1, progress }));
+  } catch {
+    message =
+      "Los ramos están marcados como cursando en esta sesión, pero no se pudo guardar el avance en el navegador.";
+  }
+
+  snapshot = { progress, message };
+  notify();
+}
+
 export function useCurriculumProgress() {
   const current = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
   return {
     ...current,
     setCourseStatus,
+    markScheduleCoursesInProgress,
   };
 }

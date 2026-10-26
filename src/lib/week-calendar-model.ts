@@ -1,3 +1,4 @@
+import { getAcademicTimeRows } from "@/lib/academic-time-axis";
 import { HOUR_HEIGHT } from "@/components/calendar/calendar-display";
 import { AGENDA_CONFIG, getFirstAvailableWeek, getSantiagoDate } from "@/config/agenda";
 import {
@@ -74,17 +75,19 @@ export function getWeekCalendarModel({
 
   const startHour = Math.min(
     AGENDA_CONFIG.defaultStartHour,
-    ...weekActivities.map((activity) => Math.floor(timeToMinutes(activity.startTime) / 60)),
+    ...weekActivities.map((activity) => timeToMinutes(activity.startTime) / 60),
   );
 
   const endHour = Math.max(
     AGENDA_CONFIG.defaultEndHour,
-    ...weekActivities.map((activity) => Math.ceil(timeToMinutes(activity.endTime) / 60)),
+    ...weekActivities.map((activity) => timeToMinutes(activity.endTime) / 60),
   );
 
   const hourCount = endHour - startHour;
   const calendarHeight = hourCount * HOUR_HEIGHT;
-  const hours = Array.from({ length: hourCount }, (_, index) => startHour + index);
+  const hours = getAcademicTimeRows(startHour * 60, endHour * 60)
+    .filter((row) => row.kind !== "gap")
+    .map((row) => row.startMinutes / 60);
 
   const rawMonthLabel = monthFormatter.format(addDays(weekStart, 3));
   const monthLabel = rawMonthLabel.charAt(0).toLocaleUpperCase("es") + rawMonthLabel.slice(1);

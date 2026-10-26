@@ -144,37 +144,6 @@ export function useSemesterPlanner(progress: CurriculumProgress) {
     setOption((current) => Math.min(result.combinations.length - 1, current + 1));
   }
 
-  function download(): void {
-    if (!report || combination.length === 0) return;
-
-    const url = URL.createObjectURL(
-      new Blob(
-        [
-          JSON.stringify(
-            {
-              version: 1,
-              program: report.program,
-              period: report.period,
-              credits: evaluation.credits,
-              sections: combination,
-            },
-            null,
-            2,
-          ),
-        ],
-        { type: "application/json" },
-      ),
-    );
-
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "horario-icci.json";
-    document.body.append(link);
-    link.click();
-    link.remove();
-    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
-  }
-
   return {
     imported,
     report,
@@ -198,6 +167,5 @@ export function useSemesterPlanner(progress: CurriculumProgress) {
     generate,
     previous,
     next,
-    download,
   };
 }

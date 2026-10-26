@@ -1,3 +1,4 @@
+import { formatResponsibleNames } from "@/lib/responsible-names";
 import { CourseSectionPicker } from "@/components/curriculum/CourseSectionPicker";
 import { useId, useRef, useState } from "react";
 
@@ -168,7 +169,9 @@ export function CourseOfferingImport({ selectedCodes }: CourseOfferingImportProp
                           </p>
                         ))}
                       </td>
-                      <td className="px-3 py-3 align-top">{row.teachers || "Por confirmar"}</td>
+                      <td className="px-3 py-3 align-top">
+                        {formatResponsibleNames(row.teachers) || "Por confirmar"}
+                      </td>
                       <td className="px-3 py-3 align-top">{row.capacity || "Por confirmar"}</td>
                     </tr>
                   ))}

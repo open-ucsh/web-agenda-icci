@@ -1,54 +1,51 @@
 import { Check } from "lucide-react";
 
-import { ACTIVITY_FILTERS } from "@/config/activity-types";
 import type { ActivityType } from "@/data/activities";
 
-import styles from "./AgendaCalendar.module.css";
+import styles from "./CalendarToolbar.module.css";
 
 interface AgendaFiltersProps {
   selectedTypes: readonly ActivityType[];
   onTypeToggle: (type: ActivityType) => void;
 }
 
-const COLORS = {
-  class: "#12376b",
-  pace: "#b54a72",
-  mentoring: "#087f8c",
-  tutoring: "#a67516",
-  workshop: "#2563eb",
-} satisfies Record<ActivityType, string>;
+const FILTERS = [
+  { id: "class", label: "Mi horario", color: "#12376b" },
+  { id: "pace", label: "PACE", color: "#be185d" },
+  { id: "mentoring", label: "Mentorías", color: "#087f8c" },
+  { id: "tutoring", label: "Ayudantías", color: "#a67516" },
+  { id: "workshop", label: "Talleres", color: "#2563eb" },
+] as const satisfies readonly {
+  id: ActivityType;
+  label: string;
+  color: string;
+}[];
 
 export function AgendaFilters({ selectedTypes, onTypeToggle }: AgendaFiltersProps) {
   return (
-    <div aria-label="Tipos de actividades" className={styles.filters} role="group">
-      {ACTIVITY_FILTERS.map((filter) => {
-        const selected = selectedTypes.includes(filter.id);
-        const color = COLORS[filter.id];
-        const personal = filter.id === "class" && selected;
+    <div aria-label="Actividades visibles" className={styles.filterList} role="group">
+      {FILTERS.map(({ id, label, color }) => {
+        const selected = selectedTypes.includes(id);
 
         return (
           <button
             aria-pressed={selected}
             className={styles.filter}
-            key={filter.id}
-            onClick={() => onTypeToggle(filter.id)}
-            style={{
-              borderColor: selected ? color : "#e2e8f0",
-              backgroundColor: personal ? color : "#ffffff",
-              color: personal ? "#ffffff" : selected ? color : "#64748b",
-            }}
+            key={id}
+            onClick={() => onTypeToggle(id)}
             type="button"
           >
             <span
               aria-hidden="true"
-              className="size-2 shrink-0 rounded-full"
+              className={styles.checkbox}
               style={{
-                backgroundColor: personal ? "#ffffff" : color,
-                opacity: selected ? 1 : 0.45,
+                borderColor: color,
+                backgroundColor: selected ? color : "transparent",
               }}
-            />
-            {filter.label}
-            {selected && <Check aria-hidden="true" className="size-3" />}
+            >
+              {selected && <Check strokeWidth={2.5} />}
+            </span>
+            <span>{label}</span>
           </button>
         );
       })}

@@ -1,18 +1,33 @@
-import { ChevronLeft, ChevronRight, Search } from "lucide-react";
-import { useId, useRef, useState } from "react";
+import { Search } from "lucide-react";
+import { useEffect, useId, useRef, useState } from "react";
 
 import { CurriculumCourseCard } from "@/components/curriculum/CurriculumCourseCard";
+import { CurriculumSearchResults } from "@/components/curriculum/CurriculumSearchResults";
 import { CurriculumCourseDialog } from "@/components/curriculum/CurriculumCourseDialog";
-import { COURSE_PROGRESS_CONFIG, isCourseDisplayStatus } from "@/config/course-progress";
+import { COURSE_PROGRESS_CONFIG } from "@/config/course-progress";
 import { CURRICULUM_COURSES, CURRICULUM_PLAN } from "@/data/curriculum";
 import { useCurriculumProgress } from "@/hooks/use-curriculum-progress";
-import { filterCurriculumCourses, getCurriculumCredits } from "@/lib/curriculum";
+import { getCurriculumCredits } from "@/lib/curriculum";
 import { getApprovedCredits, getCourseDisplayStatus } from "@/lib/curriculum-progress";
 import type { CurriculumCourse } from "@/types/curriculum";
-import type { CourseDisplayStatus } from "@/types/curriculum-progress";
+
+import styles from "./CurriculumView.module.css";
 
 const TOTAL = getCurriculumCredits(CURRICULUM_COURSES);
-const SEMESTERS = Array.from({ length: 12 }, (_, index) => index + 1);
+const YEARS = [1, 2, 3, 4, 5, 6] as const;
+const PAGES = [
+  { value: 0, label: "1.º–3.º año" },
+  { value: 1, label: "4.º–6.º año" },
+] as const;
+
+function normalizeSearch(value: string): string {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLocaleLowerCase("es-CL")
+    .trim()
+    .replace(/\s+/g, " ");
+}
 
 export function CurriculumView() {
   const id = useId();
@@ -20,7 +35,7 @@ export function CurriculumView() {
   const [selectedCourse, setSelectedCourse] = useState<CurriculumCourse | null>(null);
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(0);
-  const [status, setStatus] = useState<CourseDisplayStatus | "all">("all");
+  const scrollRef = useRef<HTMLDivElement>(null);
   const { progress, message, setCourseStatus } = useCurriculumProgress();
 
   const credits = getApprovedCredits(CURRICULUM_COURSES, progress);
@@ -28,89 +43,41 @@ export function CurriculumView() {
     (course) => progress[course.code] === "approved",
   ).length;
 
-  const searching = query.trim() !== "";
-  const semesters = searching ? SEMESTERS : SEMESTERS.slice(page * 6, page * 6 + 6);
+  const terms = normalizeSearch(query).split(" ").filter(Boolean);
+  const searching = terms.length > 0;
+  const courses = CURRICULUM_COURSES.filter((course) => {
+    const text = normalizeSearch(`${course.name} ${course.code}`);
+    return terms.every((term) => text.includes(term));
+  });
 
-  const courses = filterCurriculumCourses(CURRICULUM_COURSES, {
-    query,
-    year: null,
-    kind: "all",
-  }).filter(
-    (course) =>
-      status === "all" || getCourseDisplayStatus(course, CURRICULUM_COURSES, progress) === status,
-  );
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ left: 0, top: 0 });
+  }, [query, page]);
+
+  const visibleYears = searching
+    ? YEARS.filter((year) => courses.some((course) => Math.ceil(course.semester / 2) === year))
+    : YEARS.slice(page * 3, page * 3 + 3);
 
   function openCourse(course: CurriculumCourse, trigger: HTMLButtonElement): void {
     triggerRef.current = trigger;
     setSelectedCourse(course);
   }
 
-  function goToProgress(): void {
-    const pending = CURRICULUM_COURSES.find((course) => progress[course.code] !== "approved");
-
-    setQuery("");
-    setStatus("all");
-    setPage(pending && pending.semester > 6 ? 1 : 0);
-  }
-
-  const navigationClass =
-    "grid size-9 place-items-center rounded-md border border-border text-muted enabled:hover:bg-surface disabled:opacity-30 focus-visible:outline-2 focus-visible:outline-brand";
-
   return (
-    <section aria-labelledby={`${id}-title`} className="flex min-h-0 flex-1 flex-col">
-      <header className="flex shrink-0 flex-wrap items-center justify-between gap-3 py-4">
-        <div className="flex items-center gap-5">
-          <div>
-            <h2 className="text-lg font-semibold text-brand" id={`${id}-title`}>
-              Malla curricular
-            </h2>
-            <p className="mt-1 text-xs text-muted">
-              {searching
-                ? "Resultados en toda la malla"
-                : page === 0
-                  ? "1.º a 3.º año"
-                  : "4.º a 6.º año"}
-              {" · "}Plan {CURRICULUM_PLAN.year}
-            </p>
-          </div>
-
-          <div className="flex items-center gap-1.5">
-            <button
-              aria-label="Mostrar los primeros seis semestres"
-              className={navigationClass}
-              disabled={searching || page === 0}
-              onClick={() => setPage(0)}
-              type="button"
-            >
-              <ChevronLeft aria-hidden="true" className="size-4" />
-            </button>
-            <button
-              className="h-9 rounded-md border border-border px-3 text-xs font-medium hover:bg-surface focus-visible:outline-2 focus-visible:outline-brand"
-              onClick={goToProgress}
-              type="button"
-            >
-              Mi avance
-            </button>
-            <button
-              aria-label="Mostrar los últimos seis semestres"
-              className={navigationClass}
-              disabled={searching || page === 1}
-              onClick={() => setPage(1)}
-              type="button"
-            >
-              <ChevronRight aria-hidden="true" className="size-4" />
-            </button>
-          </div>
+    <section aria-labelledby={`${id}-title`} className={styles.view}>
+      <header className={styles.header}>
+        <div className={styles.identity}>
+          <h2 id={`${id}-title`}>Mi malla</h2>
+          <span>Plan {CURRICULUM_PLAN.year}</span>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
-          <div className="relative">
+        <div className={styles.controls}>
+          <div className={styles.search}>
             <label className="sr-only" htmlFor={`${id}-search`}>
-              Buscar ramo
+              Buscar ramo o código
             </label>
-            <Search aria-hidden="true" className="absolute top-3 left-3 size-4 text-muted" />
+            <Search aria-hidden="true" />
             <input
-              className="h-10 w-52 rounded-md border border-border bg-background pr-3 pl-9 text-sm focus-visible:outline-2 focus-visible:outline-brand"
               id={`${id}-search`}
               onChange={(event) => setQuery(event.currentTarget.value)}
               placeholder="Buscar ramo o código"
@@ -118,113 +85,149 @@ export function CurriculumView() {
               value={query}
             />
           </div>
-
-          <label className="sr-only" htmlFor={`${id}-status`}>
-            Filtrar estado
-          </label>
-          <select
-            className="h-10 rounded-md border border-border bg-background px-3 text-xs focus-visible:outline-2 focus-visible:outline-brand"
-            id={`${id}-status`}
-            onChange={(event) => {
-              const value = event.currentTarget.value;
-              if (value === "all" || isCourseDisplayStatus(value)) {
-                setStatus(value);
-              }
-            }}
-            value={status}
-          >
-            <option value="all">Todos los estados</option>
-            {Object.entries(COURSE_PROGRESS_CONFIG).map(([value, config]) => (
-              <option key={value} value={value}>
-                {config.label}
-              </option>
-            ))}
-          </select>
         </div>
       </header>
 
-      <div className="mb-4 flex shrink-0 items-center gap-4 text-xs">
-        <p className="shrink-0 text-muted">
-          <span className="font-semibold text-brand">{credits}</span> / {TOTAL} SCT aprobados
-        </p>
-        <progress
-          aria-label="Créditos aprobados"
-          className="h-1.5 min-w-8 flex-1 accent-emerald-600"
-          max={TOTAL}
-          value={credits}
-        />
-        <span className="hidden text-muted sm:block">{approved} ramos aprobados</span>
+      <div className={styles.summary}>
+        {searching ? (
+          <div className="flex flex-wrap items-center gap-4">
+            <p aria-live="polite" className={styles.results}>
+              {courses.length} {courses.length === 1 ? "resultado" : "resultados"} en toda la malla
+            </p>
+            <button
+              className="min-h-9 rounded px-2 text-xs font-medium text-brand hover:bg-surface focus-visible:outline-2 focus-visible:outline-brand"
+              onClick={() => setQuery("")}
+              type="button"
+            >
+              Volver a la malla
+            </button>
+          </div>
+        ) : (
+          <div aria-label="Años de la malla" className={styles.navigation} role="group">
+            {PAGES.map((item) => (
+              <button
+                aria-pressed={page === item.value}
+                key={item.value}
+                onClick={() => setPage(item.value)}
+                type="button"
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
+        )}
+
+        <div className={styles.progress}>
+          <p>
+            <strong>{credits}</strong> / {TOTAL} SCT aprobados
+          </p>
+          <progress aria-label="Créditos aprobados" max={TOTAL} value={credits} />
+          <span>{approved} ramos aprobados</span>
+        </div>
       </div>
 
       {message && (
-        <p className="mb-3 text-xs text-amber-800" role="status">
+        <p className={styles.message} role="status">
           {message}
         </p>
       )}
 
       <div
-        aria-label="Malla curricular por semestre"
-        className="min-h-0 flex-1 overflow-auto overscroll-contain rounded-md border border-border focus-visible:outline-2 focus-visible:outline-brand"
+        aria-label="Malla curricular por año y semestre"
+        className={styles.scroll}
+        ref={scrollRef}
         role="region"
         tabIndex={0}
       >
-        <div className="flex min-h-full min-w-full">
-          {semesters.map((semester) => {
-            const items = courses.filter((course) => course.semester === semester);
-            const semesterCredits = getCurriculumCredits(
-              CURRICULUM_COURSES.filter((course) => course.semester === semester),
-            );
-
-            return (
-              <section
-                aria-labelledby={`${id}-semester-${semester}`}
-                className="min-w-52 flex-1 basis-0 border-r border-border last:border-r-0"
-                key={semester}
-              >
-                <header className="sticky top-0 z-10 border-b border-border bg-background text-center">
-                  <p className="border-b border-border bg-surface py-2 text-xs font-medium text-brand">
-                    {Math.ceil(semester / 2)}.º año
-                  </p>
-                  <h3
-                    className="pt-3 text-sm font-semibold text-brand"
-                    id={`${id}-semester-${semester}`}
-                  >
-                    Semestre {semester}
-                  </h3>
-                  <p className="pb-3 pt-1 text-xs text-muted">
-                    Nivel {semester * 100} · {semesterCredits} SCT
-                  </p>
+        {searching ? (
+          <CurriculumSearchResults
+            courses={courses}
+            onClear={() => setQuery("")}
+            onOpen={openCourse}
+            progress={progress}
+            query={query}
+          />
+        ) : visibleYears.length === 0 ? (
+          <div className={styles.empty}>
+            <p>No encontramos ramos con esa búsqueda.</p>
+            <button
+              onClick={() => {
+                setQuery("");
+              }}
+              type="button"
+            >
+              Limpiar búsqueda
+            </button>
+          </div>
+        ) : (
+          <div className={styles.years}>
+            {visibleYears.map((year) => (
+              <section aria-labelledby={`${id}-year-${year}`} className={styles.year} key={year}>
+                <header className={styles.yearHeader}>
+                  <h3 id={`${id}-year-${year}`}>{year}.º año</h3>
+                  <div className={styles.semesterHeaders}>
+                    {[year * 2 - 1, year * 2].map((semester) => (
+                      <div key={semester}>
+                        <h4 id={`${id}-semester-${semester}`}>Semestre {semester}</h4>
+                        <p>
+                          {getCurriculumCredits(
+                            CURRICULUM_COURSES.filter((course) => course.semester === semester),
+                          )}{" "}
+                          SCT
+                        </p>
+                      </div>
+                    ))}
+                  </div>
                 </header>
 
-                <ul className="space-y-2 p-2">
-                  {items.map((course) => (
-                    <li key={course.code}>
-                      <CurriculumCourseCard
-                        course={course}
-                        onOpen={openCourse}
-                        status={getCourseDisplayStatus(course, CURRICULUM_COURSES, progress)}
-                      />
-                    </li>
-                  ))}
-                </ul>
+                <div className={styles.semesters}>
+                  {[year * 2 - 1, year * 2].map((semester) => {
+                    const items = courses.filter((course) => course.semester === semester);
 
-                {items.length === 0 && (
-                  <p className="p-4 text-center text-xs text-muted">Sin coincidencias</p>
-                )}
+                    return (
+                      <section
+                        aria-labelledby={`${id}-semester-${semester}`}
+                        className={styles.semester}
+                        key={semester}
+                      >
+                        <ul className={styles.courses}>
+                          {items.map((course) => (
+                            <li key={course.code}>
+                              <CurriculumCourseCard
+                                course={course}
+                                onOpen={openCourse}
+                                status={getCourseDisplayStatus(
+                                  course,
+                                  CURRICULUM_COURSES,
+                                  progress,
+                                )}
+                              />
+                            </li>
+                          ))}
+                        </ul>
+                        {items.length === 0 && (
+                          <p className={styles.noMatches}>Sin coincidencias</p>
+                        )}
+                      </section>
+                    );
+                  })}
+                </div>
               </section>
-            );
-          })}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
 
-      <footer className="flex shrink-0 flex-wrap items-center justify-between gap-2 py-3 text-xs text-muted">
-        <span>Plan ICCI UCSH {CURRICULUM_PLAN.year}</span>
-        <span aria-live="polite">
-          {searching
-            ? `${courses.length} resultados`
-            : `Semestres ${page * 6 + 1}–${page * 6 + 6} de 12`}
-        </span>
-        <span>Open UCSH</span>
+      <footer className={styles.footer}>
+        <div aria-label="Estados de los ramos" className={styles.legend}>
+          {Object.entries(COURSE_PROGRESS_CONFIG).map(([value, config]) => (
+            <span className={styles.legendItem} key={value}>
+              <i aria-hidden="true" className={`${styles.legendSample} ${config.className}`} />
+              {config.label}
+            </span>
+          ))}
+        </div>
+        <p>Selecciona un ramo para ver sus requisitos o cambiar su estado.</p>
       </footer>
 
       <CurriculumCourseDialog

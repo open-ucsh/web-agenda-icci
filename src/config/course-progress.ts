@@ -2,7 +2,7 @@ import type { CourseDisplayStatus } from "@/types/curriculum-progress";
 
 export const COURSE_PROGRESS_CONFIG = {
   available: {
-    label: "Disponible",
+    label: "Cumple requisitos",
     className: "border-blue-200 border-l-blue-500 bg-blue-50",
     textClassName: "text-blue-800",
     symbol: "○",
