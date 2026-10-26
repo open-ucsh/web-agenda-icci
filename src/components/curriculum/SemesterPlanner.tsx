@@ -1,20 +1,13 @@
-import {
-  CheckCircle2,
-  ChevronLeft,
-  ChevronRight,
-  Download,
-  FileSpreadsheet,
-  X,
-} from "lucide-react";
+import { ScheduleSections } from "@/components/curriculum/ScheduleSections";
+import { getCourseAppearance } from "@/config/course-appearance";
+import { CheckCircle2, ChevronLeft, ChevronRight, FileSpreadsheet, X } from "lucide-react";
 import { useId, useRef } from "react";
 
 import { OfferingImportGuide } from "@/components/curriculum/OfferingImportGuide";
 import { ScheduleApply } from "@/components/curriculum/ScheduleApply";
 import { SchedulePreview } from "@/components/curriculum/SchedulePreview";
 import { Dialog } from "@/components/ui/Dialog";
-import { CURRICULUM_COURSES } from "@/data/curriculum";
 import { useSemesterPlanner } from "@/hooks/use-semester-planner";
-import { getCourseRequirements } from "@/lib/curriculum-progress";
 import type { PersonalSchedule } from "@/lib/personal-agenda";
 import type { MinimumLoadException } from "@/lib/semester-plan";
 import type { CurriculumCourse } from "@/types/curriculum";
@@ -43,34 +36,31 @@ export function SemesterPlanner({ progress, onEditCourse, onUseSchedule }: Semes
   const sectionsTriggerRef = useRef<HTMLButtonElement>(null);
 
   function renderCourse(course: CurriculumCourse, blocked: boolean) {
-    const requirements = getCourseRequirements(course, CURRICULUM_COURSES, progress);
-    const missingNames = requirements.missingPrerequisites.map(
-      (code) => CURRICULUM_COURSES.find((item) => item.code === code)?.name ?? code,
-    );
+    const appearance = getCourseAppearance(course.code);
+    const checked = planner.selectedCodes.includes(course.code);
 
     return (
       <li key={course.code}>
-        <label className={styles.course}>
+        <label
+          className={styles.course}
+          style={{
+            backgroundColor: checked ? appearance.background : "#ffffff",
+            borderLeftColor: appearance.accent,
+          }}
+        >
           <input
-            checked={planner.selectedCodes.includes(course.code)}
+            checked={checked}
             disabled={blocked}
             onChange={(event) => planner.toggleCourse(course.code, event.currentTarget.checked)}
+            style={{ accentColor: appearance.accent }}
             type="checkbox"
           />
-          <span className="min-w-0">
+          <span className="min-w-0 flex-1">
             <span className={styles.courseName}>{course.name}</span>
             <span className={styles.courseMeta}>
               {course.code} · {course.credits} SCT
               {progress[course.code] === "failed" && " · Reprobado"}
             </span>
-            {missingNames.length > 0 && (
-              <span className={styles.courseMeta}>Requiere {missingNames.join(", ")}</span>
-            )}
-            {requirements.missingCredits > 0 && (
-              <span className={styles.courseMeta}>
-                Faltan {requirements.missingCredits} SCT aprobados
-              </span>
-            )}
           </span>
         </label>
       </li>
@@ -180,13 +170,6 @@ export function SemesterPlanner({ progress, onEditCourse, onUseSchedule }: Semes
                   <p className="py-4 text-xs leading-5 text-muted">
                     No hay ramos disponibles con esa búsqueda y tu avance actual.
                   </p>
-                )}
-
-                {planner.blocked.length > 0 && (
-                  <details className={styles.disclosure}>
-                    <summary>Ramos con requisitos pendientes ({planner.blocked.length})</summary>
-                    <ul>{planner.blocked.map((course) => renderCourse(course, true))}</ul>
-                  </details>
                 )}
               </div>
 
@@ -332,15 +315,6 @@ export function SemesterPlanner({ progress, onEditCourse, onUseSchedule }: Semes
               <p className="mt-1 text-xs text-muted">El avance se guarda por separado</p>
             </div>
             <div className={styles.actions}>
-              <button
-                className={styles.secondary}
-                disabled={planner.combination.length === 0}
-                onClick={planner.download}
-                type="button"
-              >
-                <Download aria-hidden="true" className="size-4" />
-                Descargar
-              </button>
               <ScheduleApply
                 key={planner.imported?.revision}
                 onUse={onUseSchedule}
@@ -427,27 +401,7 @@ export function SemesterPlanner({ progress, onEditCourse, onUseSchedule }: Semes
             <X aria-hidden="true" className="size-4" />
           </button>
         </header>
-        <ul className="min-h-0 divide-y divide-border overflow-y-auto px-5">
-          {planner.combination.map((section) => (
-            <li className="py-4" key={section.id}>
-              <p className="text-sm font-semibold text-brand">
-                {section.code} · Sección {section.section}
-              </p>
-              <p className="mt-1 text-xs text-muted">
-                Grupo {section.group} · {section.shift}
-              </p>
-              {section.rows.map((row) => (
-                <div className="mt-3 space-y-1 text-xs leading-5" key={row.sourceRow}>
-                  <p className="font-medium">{row.activity}</p>
-                  <p>{row.rawSchedule}</p>
-                  <p className="text-muted">
-                    {row.teachers || "Docente pendiente"} · Cupos: {row.capacity || "por confirmar"}
-                  </p>
-                </div>
-              ))}
-            </li>
-          ))}
-        </ul>
+        <ScheduleSections sections={planner.combination} />
       </Dialog>
     </section>
   );
