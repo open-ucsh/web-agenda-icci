@@ -11,6 +11,15 @@ interface ActivityTypeConfig {
 }
 
 export const ACTIVITY_TYPE_CONFIG = {
+  class: {
+    label: "Clase",
+    filterLabel: "Mi horario",
+    description: "Clase de tu horario personal",
+    card: "border-brand/20 border-l-brand bg-background text-brand hover:border-brand/40 hover:bg-surface",
+    className: "bg-brand/10 text-brand",
+    dot: "bg-brand",
+    active: "border-brand/30 bg-brand/5 text-brand",
+  },
   pace: {
     label: "PACE",
     filterLabel: "PACE",

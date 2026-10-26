@@ -1,51 +1,51 @@
-import { ACTIVITY_FILTERS } from "@/config/activity-types";
-
 import { Check } from "lucide-react";
 
 import type { ActivityType } from "@/data/activities";
+
+import styles from "./CalendarToolbar.module.css";
 
 interface AgendaFiltersProps {
   selectedTypes: readonly ActivityType[];
   onTypeToggle: (type: ActivityType) => void;
 }
 
+const FILTERS = [
+  { id: "class", label: "Mi horario", color: "#12376b" },
+  { id: "pace", label: "PACE", color: "#be185d" },
+  { id: "mentoring", label: "Mentorías", color: "#087f8c" },
+  { id: "tutoring", label: "Ayudantías", color: "#a67516" },
+  { id: "workshop", label: "Talleres", color: "#2563eb" },
+] as const satisfies readonly {
+  id: ActivityType;
+  label: string;
+  color: string;
+}[];
+
 export function AgendaFilters({ selectedTypes, onTypeToggle }: AgendaFiltersProps) {
   return (
-    <div
-      aria-label="Tipos de actividades"
-      className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:flex lg:items-center"
-      role="group"
-    >
-      {ACTIVITY_FILTERS.map((filter) => {
-        const selected = selectedTypes.includes(filter.id);
+    <div aria-label="Actividades visibles" className={styles.filterList} role="group">
+      {FILTERS.map(({ id, label, color }) => {
+        const selected = selectedTypes.includes(id);
 
         return (
           <button
             aria-pressed={selected}
-            className={[
-              "inline-flex h-9 min-w-0 items-center justify-center gap-2 rounded-md border px-3 text-xs font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand",
-              selected ? filter.active : "border-border bg-background text-muted hover:bg-surface",
-            ].join(" ")}
-            key={filter.id}
-            onClick={() => onTypeToggle(filter.id)}
+            className={styles.filter}
+            key={id}
+            onClick={() => onTypeToggle(id)}
             type="button"
           >
             <span
               aria-hidden="true"
-              className={[
-                "size-2 shrink-0 rounded-full",
-                filter.dot,
-                selected ? "" : "opacity-35",
-              ].join(" ")}
-            />
-
-            <span>{filter.label}</span>
-
-            <Check
-              aria-hidden="true"
-              className={["size-3 shrink-0", selected ? "visible" : "invisible"].join(" ")}
-              strokeWidth={2}
-            />
+              className={styles.checkbox}
+              style={{
+                borderColor: color,
+                backgroundColor: selected ? color : "transparent",
+              }}
+            >
+              {selected && <Check strokeWidth={2.5} />}
+            </span>
+            <span>{label}</span>
           </button>
         );
       })}

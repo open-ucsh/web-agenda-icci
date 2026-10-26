@@ -1,4 +1,6 @@
+import { formatResponsibleNames } from "@/lib/responsible-names";
 import { Dialog } from "@/components/ui/Dialog";
+import { CalendarExportActions } from "@/components/calendar/CalendarExportActions";
 
 import { ACTIVITY_TYPE_CONFIG } from "@/config/activity-types";
 
@@ -114,7 +116,7 @@ export function ActivityDetails({
                   <dt className="text-xs text-muted">Responsable</dt>
 
                   <dd className="mt-1 text-sm font-medium leading-6 wrap-break-word">
-                    {activity.mentor}
+                    {formatResponsibleNames(activity.mentor)}
                   </dd>
                 </div>
               </div>
@@ -135,6 +137,16 @@ export function ActivityDetails({
                 </div>
               </div>
             </dl>
+
+            <div className="mt-4 border-t border-border pt-4">
+              <CalendarExportActions
+                key={activity.id}
+                activities={[activity]}
+                filename={`agenda-icci-${activity.date}-${activity.startTime.replace(":", "")}.ics`}
+                label="Descargar actividad (.ics)"
+                googleActivity={activity}
+              />
+            </div>
           </>
         )}
       </div>

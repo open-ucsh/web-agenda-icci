@@ -94,3 +94,21 @@ VALUES
         'Franklin Cubillán', 'facilitator', NULL,
         '2026-10-20', '2026-12-19'
     );
+
+-- Inicio de clases por período académico
+INSERT INTO academic_dates (
+    id, period_id, title, starts_on, ends_on, featured, source
+) VALUES (
+    'semester-start-2026-2',
+    '2026-2',
+    'Inicio de clases',
+    '2026-08-03',
+    '2026-08-03',
+    0,
+    'Fecha confirmada para el segundo semestre de 2026'
+)
+ON CONFLICT(id) DO UPDATE SET
+    title = excluded.title,
+    starts_on = excluded.starts_on,
+    ends_on = excluded.ends_on,
+    source = excluded.source;

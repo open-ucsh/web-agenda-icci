@@ -1,0 +1,385 @@
+.view {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.625rem 1rem;
+  padding-block: 0.875rem 0.625rem;
+}
+
+.identity {
+  display: flex;
+  align-items: baseline;
+  gap: 0.625rem;
+}
+
+.identity h2 {
+  margin: 0;
+  color: var(--color-brand);
+  font-size: 1.125rem;
+  font-weight: 650;
+  letter-spacing: -0.025em;
+}
+
+.identity > span {
+  color: var(--color-muted);
+  font-size: 0.6875rem;
+}
+
+.controls {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.search {
+  position: relative;
+  min-width: 0;
+  flex: 1;
+}
+
+.search svg {
+  position: absolute;
+  top: 50%;
+  left: 0.625rem;
+  width: 0.875rem;
+  height: 0.875rem;
+  transform: translateY(-50%);
+  color: var(--color-muted);
+  pointer-events: none;
+}
+
+.search input,
+.select {
+  height: 2.25rem;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  background: var(--color-background);
+  color: var(--color-text);
+  font: inherit;
+  font-size: 0.75rem;
+}
+
+.search input {
+  width: 100%;
+  min-width: 0;
+  padding: 0 0.625rem 0 1.875rem;
+}
+
+.select {
+  max-width: 100%;
+  padding-inline: 0.625rem;
+}
+
+.summary {
+  display: flex;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.625rem 1.5rem;
+  padding-bottom: 0.75rem;
+}
+
+.navigation {
+  display: inline-flex;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+}
+
+.navigation button {
+  min-height: 2.25rem;
+  border: 0;
+  background: var(--color-background);
+  padding-inline: 0.875rem;
+  color: var(--color-muted);
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.navigation button + button {
+  border-left: 1px solid var(--color-border);
+}
+
+.navigation button:hover {
+  background: var(--color-surface);
+  color: var(--color-brand);
+}
+
+.navigation button[aria-pressed="true"] {
+  background: var(--color-brand);
+  color: white;
+}
+
+.progress {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.625rem;
+  color: var(--color-muted);
+  font-size: 0.6875rem;
+}
+
+.progress p {
+  margin: 0;
+}
+
+.progress strong {
+  color: var(--color-brand);
+  font-weight: 650;
+}
+
+.progress progress {
+  width: 7rem;
+  height: 0.3125rem;
+  overflow: hidden;
+  border: 0;
+  border-radius: 1rem;
+  appearance: none;
+  background: var(--color-border);
+  accent-color: #15803d;
+}
+
+.progress progress::-webkit-progress-bar {
+  background: var(--color-border);
+}
+
+.progress progress::-webkit-progress-value {
+  border-radius: 1rem;
+  background: #15803d;
+}
+
+.progress progress::-moz-progress-bar {
+  border-radius: 1rem;
+  background: #15803d;
+}
+
+.results,
+.message {
+  margin: 0;
+  font-size: 0.75rem;
+}
+
+.results {
+  color: var(--color-muted);
+}
+
+.message {
+  padding-bottom: 0.75rem;
+  color: #92400e;
+}
+
+.scroll {
+  min-height: 0;
+  flex: 1;
+  overflow: auto;
+  overscroll-behavior: contain;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+}
+
+.years {
+  display: flex;
+  min-width: 100%;
+  min-height: 100%;
+  align-items: stretch;
+}
+
+.year {
+  min-width: 25rem;
+  flex: 1 0 25rem;
+  border-right: 1px solid var(--color-border);
+}
+
+.year:last-child {
+  border-right: 0;
+}
+
+.yearHeader {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--color-background);
+}
+
+.yearHeader > h3 {
+  margin: 0;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+  padding: 0.5rem;
+  color: var(--color-brand);
+  text-align: center;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.semesterHeaders,
+.semesters {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.semesterHeaders {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.semesterHeaders > div {
+  padding: 0.625rem 0.5rem;
+  text-align: center;
+}
+
+.semesterHeaders > div + div,
+.semester + .semester {
+  border-left: 1px solid var(--color-border);
+}
+
+.semesterHeaders h4 {
+  margin: 0;
+  color: var(--color-brand);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.semesterHeaders p {
+  margin: 0.2rem 0 0;
+  color: var(--color-muted);
+  font-size: 0.6875rem;
+}
+
+.semester {
+  min-width: 0;
+}
+
+.courses {
+  display: flex;
+  margin: 0;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  list-style: none;
+}
+
+.noMatches {
+  margin: 0;
+  padding: 1rem 0.5rem;
+  color: var(--color-muted);
+  text-align: center;
+  font-size: 0.6875rem;
+}
+
+.empty {
+  display: grid;
+  min-height: 12rem;
+  align-content: center;
+  justify-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  color: var(--color-muted);
+  text-align: center;
+  font-size: 0.8125rem;
+}
+
+.empty p {
+  margin: 0;
+}
+
+.empty button {
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  background: white;
+  padding: 0.5rem 0.75rem;
+  color: var(--color-brand);
+  font: inherit;
+}
+
+.footer {
+  display: flex;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  padding-block: 0.625rem;
+  color: var(--color-muted);
+  font-size: 0.625rem;
+}
+
+.footer p {
+  margin: 0;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.875rem;
+}
+
+.legendItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.legendSample {
+  display: block;
+  width: 0.625rem;
+  height: 0.625rem;
+  border: 1px solid;
+  border-left-width: 3px;
+  border-radius: 2px;
+}
+
+.search input:focus-visible,
+.select:focus-visible,
+.empty button:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+}
+
+.navigation button:focus-visible,
+.scroll:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: -3px;
+}
+
+@media (min-width: 640px) {
+  .search input {
+    width: 13rem;
+  }
+}
+
+@media (max-width: 639px) {
+  .controls {
+    width: 100%;
+  }
+
+  .summary {
+    align-items: flex-start;
+  }
+
+  .progress {
+    width: 100%;
+  }
+
+  .progress progress {
+    min-width: 3rem;
+    flex: 1;
+  }
+
+  .year {
+    min-width: 21rem;
+    flex-basis: 21rem;
+  }
+}

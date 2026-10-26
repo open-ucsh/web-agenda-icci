@@ -97,6 +97,7 @@ export function WeekCalendar({
         firstWeek={firstWeek}
         monthLabel={monthLabel}
         selectedTypes={selectedTypes}
+        weekActivities={weekActivities}
         onTypeToggle={onTypeToggle}
         changeWeek={changeWeek}
         goToToday={goToToday}
