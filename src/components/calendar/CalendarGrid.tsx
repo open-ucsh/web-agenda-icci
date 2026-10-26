@@ -1,15 +1,18 @@
+import { Link2 } from "lucide-react";
+
 import { ActivityCard } from "@/components/calendar/ActivityCard";
 import {
   DAY_NAMES,
-  HOUR_HEIGHT,
   dayColumnClass,
-  formatHour,
   fullDateFormatter,
 } from "@/components/calendar/calendar-display";
 import { getHoliday, type Activity, type Holiday } from "@/data/activities";
+import { formatAcademicTime, getAcademicTimeRows } from "@/lib/academic-time-axis";
 import { positionActivities } from "@/lib/calendar-layout";
 import { dateKey } from "@/lib/dates";
 import { timeToMinutes } from "@/lib/time";
+
+import styles from "./AgendaCalendar.module.css";
 
 interface CalendarAcademicDate {
   id: string;
@@ -49,207 +52,204 @@ export function CalendarGrid({
   hasHolidays,
   startHour,
   endHour,
-  hours,
-  calendarHeight,
   onOpenActivity,
 }: CalendarGridProps) {
+  const start = startHour * 60;
+  const end = endHour * 60;
+  const duration = end - start;
+  const rows = getAcademicTimeRows(start, end);
+  const marks = rows.filter((row) => row.kind !== "gap");
+  const longBreaks = rows.filter(
+    (row) => row.kind === "gap" && row.endMinutes - row.startMinutes >= 30,
+  );
+
   return (
-    <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-md border border-border">
-      <div className="flex shrink-0 items-center justify-between gap-3 border-b border-border bg-surface px-3 py-2 md:hidden">
-        <p aria-live="polite" className="min-w-0 text-xs font-medium capitalize" id={mobilePanelId}>
-          {fullDateFormatter.format(selectedDate)}
-        </p>
+    <>
+      <div className={styles.frame}>
+        <div className="flex shrink-0 items-center justify-between gap-3 border-b border-border px-3 py-2 md:hidden">
+          <p className="text-xs font-medium capitalize" id={mobilePanelId}>
+            {fullDateFormatter.format(selectedDate)}
+          </p>
+          <span className="text-xs text-muted">
+            {selectedHoliday ? "Feriado" : `${selectedActivityCount} act.`}
+          </span>
+        </div>
 
-        <span className="shrink-0 text-xs tabular-nums text-muted">
-          {selectedHoliday ? "Feriado" : `${selectedActivityCount} act.`}
-        </span>
-      </div>
-
-      <div
-        aria-label="Horario de actividades. Desplázate para consultar las horas."
-        className="min-h-0 flex-1 overflow-auto overscroll-contain focus-visible:outline-2 focus-visible:outline-brand"
-        role="region"
-        tabIndex={0}
-      >
-        <div className="min-w-0 md:min-w-240">
-          <div className="sticky top-0 z-20 bg-background">
-            <div className="hidden border-b border-border md:flex">
-              <div aria-hidden="true" className="sticky left-0 z-30 w-16 shrink-0 bg-background" />
-
-              {days.map((day, index) => {
-                const key = dateKey(day);
-                const isToday = key === todayKey;
-                const holiday = getHoliday(key);
-
-                return (
-                  <div
-                    className={[
-                      dayColumnClass(index, selectedDay),
-                      "border-l border-border py-3",
-                      holiday || index >= 5 ? "bg-surface" : "bg-background",
-                    ].join(" ")}
-                    key={key}
-                  >
-                    <div className="flex items-center justify-center gap-1.5">
-                      <span
-                        className={[
-                          "text-xs font-medium",
-                          index >= 5 ? "text-muted" : "text-text",
-                        ].join(" ")}
-                      >
-                        {DAY_NAMES[index]}
-                      </span>
-
-                      <time
-                        aria-current={isToday ? "date" : undefined}
-                        className={[
-                          "grid size-7 place-items-center rounded-full text-sm font-semibold tabular-nums",
-                          isToday ? "bg-brand text-white" : index >= 5 ? "text-muted" : "text-text",
-                        ].join(" ")}
-                        dateTime={key}
-                      >
-                        {day.getDate()}
-                      </time>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {(visibleAcademicDates.length > 0 || hasHolidays) && (
-              <div className="flex border-b border-border">
-                <div className="sticky left-0 z-30 flex w-12 shrink-0 items-center justify-center bg-background px-1 py-2 md:w-16">
-                  <span className="text-center text-xs leading-4 text-muted">Fechas clave</span>
-                </div>
-
+        <div
+          aria-label="Agenda semanal. Desplázate para consultar todo el horario."
+          className={styles.scroll}
+          role="region"
+          tabIndex={0}
+        >
+          <div className={styles.inner}>
+            <div className={styles.stickyHeader}>
+              <div className={`${styles.dayHeader} hidden md:flex`}>
+                <div aria-hidden="true" className={styles.gutter} />
                 {days.map((day, index) => {
                   const key = dateKey(day);
-                  const holiday = getHoliday(key);
-                  const dates = visibleAcademicDates.filter(
-                    (item) => item.startsOn <= key && item.endsOn >= key,
-                  );
+                  const isToday = key === todayKey;
 
                   return (
                     <div
                       className={[
                         dayColumnClass(index, selectedDay),
-                        "space-y-1 border-l border-border p-1.5",
-                        holiday || index >= 5 ? "bg-surface" : "bg-background",
+                        styles.dayHeading,
+                        index >= 5 ? styles.weekend : "",
                       ].join(" ")}
                       key={key}
                     >
-                      {holiday && (
-                        <div
-                          className="rounded border border-brand/10 bg-brand/5 px-2 py-1 text-xs leading-5 text-brand"
-                          title={`Feriado nacional: ${holiday.name}. Sin actividades.`}
+                      <div className={styles.dateLine}>
+                        <span>{DAY_NAMES[index]}</span>
+                        <time
+                          aria-current={isToday ? "date" : undefined}
+                          className={[styles.dateNumber, isToday ? styles.today : ""].join(" ")}
+                          dateTime={key}
                         >
-                          <p className="font-medium">Feriado nacional</p>
-                          <p className="md:truncate">{holiday.name}</p>
-                        </div>
-                      )}
-
-                      {dates.map((item) => (
-                        <p
-                          className="rounded border border-border bg-surface px-2 py-1 text-xs leading-5 text-muted md:truncate"
-                          key={item.id}
-                          title={item.title}
-                        >
-                          {item.title}
-                        </p>
-                      ))}
-
-                      {!holiday && dates.length === 0 && (
-                        <p className="px-2 text-xs leading-5 text-muted md:hidden">
-                          Sin fechas clave este día
-                        </p>
-                      )}
+                          {day.getDate()}
+                        </time>
+                      </div>
                     </div>
                   );
                 })}
               </div>
-            )}
-          </div>
 
-          <div className="flex" style={{ height: calendarHeight }}>
-            <div
-              aria-hidden="true"
-              className="sticky left-0 z-10 w-12 shrink-0 bg-background md:w-16"
-            >
-              {hours.map((hour) => (
-                <div
-                  className="pr-2 pt-1 text-right text-xs tabular-nums text-muted md:pr-3"
-                  key={hour}
-                  style={{ height: HOUR_HEIGHT }}
-                >
-                  {formatHour(hour)}
-                </div>
-              ))}
-            </div>
-
-            {days.map((day, index) => {
-              const key = dateKey(day);
-              const holiday = getHoliday(key);
-              const dayActivities = weekActivities.filter((activity) => activity.date === key);
-              const positioned = positionActivities(dayActivities);
-
-              return (
-                <section
-                  aria-label={`${fullDateFormatter.format(day)}${
-                    holiday ? `. Feriado: ${holiday.name}` : ""
-                  }`}
-                  className={[
-                    dayColumnClass(index, selectedDay),
-                    "relative border-l border-border",
-                    holiday || index >= 5 ? "bg-surface/70" : "bg-background",
-                  ].join(" ")}
-                  key={key}
-                >
-                  <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-                    {hours.map((hour) => (
-                      <div
-                        className="relative border-b border-border/70"
-                        key={hour}
-                        style={{ height: HOUR_HEIGHT }}
-                      >
-                        <div className="absolute inset-x-0 top-1/2 border-t border-dashed border-border/40" />
-                      </div>
-                    ))}
+              {(visibleAcademicDates.length > 0 || hasHolidays) && (
+                <div className={styles.academicDates}>
+                  <div className={`${styles.gutter} flex items-center justify-center px-1`}>
+                    <span className="text-center text-[10px] text-muted">Fechas clave</span>
                   </div>
-
-                  {positioned.map(({ activity, column, columns }) => {
-                    const start = timeToMinutes(activity.startTime);
-                    const end = timeToMinutes(activity.endTime);
-                    const top = ((start - startHour * 60) / 60) * HOUR_HEIGHT;
-                    const height = ((end - start) / 60) * HOUR_HEIGHT;
+                  {days.map((day, index) => {
+                    const key = dateKey(day);
+                    const holiday = getHoliday(key);
+                    const dates = visibleAcademicDates.filter(
+                      (item) => item.startsOn <= key && item.endsOn >= key,
+                    );
 
                     return (
                       <div
-                        className="absolute px-0.5 py-0.5"
-                        key={activity.id}
-                        style={{
-                          top,
-                          height,
-                          left: `${(column / columns) * 100}%`,
-                          width: `${100 / columns}%`,
-                        }}
+                        className={[
+                          dayColumnClass(index, selectedDay),
+                          styles.academicCell,
+                          index >= 5 ? styles.weekend : "",
+                        ].join(" ")}
+                        key={key}
                       >
-                        <ActivityCard activity={activity} onOpen={onOpenActivity} />
+                        {holiday && (
+                          <p className={styles.milestone} title={`Feriado: ${holiday.name}`}>
+                            {holiday.name} · Sin actividades
+                          </p>
+                        )}
+                        {dates.map((item) => (
+                          <p className={styles.milestone} key={item.id} title={item.title}>
+                            {item.title}
+                          </p>
+                        ))}
                       </div>
                     );
                   })}
-                </section>
-              );
-            })}
-          </div>
+                </div>
+              )}
+            </div>
 
-          <div
-            aria-hidden="true"
-            className="h-6 pl-1 text-xs leading-6 tabular-nums text-muted md:pl-3"
-          >
-            {formatHour(endHour)}
+            <div className={styles.timeline}>
+              <div aria-hidden="true" className={styles.timeColumn}>
+                {marks.map((mark) => (
+                  <span
+                    className={styles.time}
+                    key={mark.startMinutes}
+                    style={{
+                      top: `calc(${((mark.startMinutes - start) / duration) * 100}% + 4px)`,
+                    }}
+                  >
+                    {formatAcademicTime(mark.startMinutes)}
+                  </span>
+                ))}
+                {longBreaks.map((gap) => (
+                  <span
+                    className={styles.breakTime}
+                    key={`gap-${gap.startMinutes}`}
+                    style={{
+                      top: `${(((gap.startMinutes + gap.endMinutes) / 2 - start) / duration) * 100}%`,
+                    }}
+                  >
+                    {formatAcademicTime(gap.startMinutes)}–{formatAcademicTime(gap.endMinutes)}
+                  </span>
+                ))}
+              </div>
+
+              {days.map((day, index) => {
+                const key = dateKey(day);
+                const holiday = getHoliday(key);
+                const positioned = positionActivities(
+                  weekActivities.filter((activity) => activity.date === key),
+                );
+
+                return (
+                  <section
+                    aria-label={`${fullDateFormatter.format(day)}${holiday ? `. Feriado: ${holiday.name}` : ""}`}
+                    className={[
+                      dayColumnClass(index, selectedDay),
+                      styles.dayColumn,
+                      index >= 5 || holiday ? styles.weekend : "",
+                    ].join(" ")}
+                    key={key}
+                  >
+                    {marks.map((mark) => (
+                      <div
+                        aria-hidden="true"
+                        className={styles.line}
+                        key={mark.startMinutes}
+                        style={{
+                          top: `${((mark.startMinutes - start) / duration) * 100}%`,
+                        }}
+                      />
+                    ))}
+
+                    {positioned.map(({ activity, column, columns }) => {
+                      const activityStart = timeToMinutes(activity.startTime);
+                      const activityEnd = timeToMinutes(activity.endTime);
+
+                      return (
+                        <div
+                          className={styles.eventPosition}
+                          key={activity.id}
+                          style={{
+                            top: `${((activityStart - start) / duration) * 100}%`,
+                            height: `${((activityEnd - activityStart) / duration) * 100}%`,
+                            left: `${(column / columns) * 100}%`,
+                            width: `${100 / columns}%`,
+                          }}
+                        >
+                          <ActivityCard activity={activity} onOpen={onOpenActivity} />
+                        </div>
+                      );
+                    })}
+                  </section>
+                );
+              })}
+            </div>
+
+            <div aria-hidden="true" className="h-5 shrink-0 pl-3 text-[10px] leading-5 text-muted">
+              {formatAcademicTime(end)}
+            </div>
           </div>
         </div>
       </div>
-    </div>
+
+      <div className={styles.legend}>
+        <span>
+          <i aria-hidden="true" className={styles.classSample} />
+          Clase
+        </span>
+        <span>
+          <i aria-hidden="true" className={styles.supportSample} />
+          Apoyo
+        </span>
+        <span>
+          <Link2 aria-hidden="true" />
+          Con prerrequisitos
+        </span>
+      </div>
+    </>
   );
 }

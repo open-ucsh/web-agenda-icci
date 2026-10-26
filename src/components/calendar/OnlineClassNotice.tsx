@@ -2,26 +2,21 @@ import { CloudRain } from "lucide-react";
 
 import { ONLINE_CLASS_NOTICE } from "@/data/activities";
 
+import styles from "./AgendaCalendar.module.css";
+
 interface OnlineClassNoticeProps {
   selectedKey: string;
 }
 
-export function OnlineClassNotice({ selectedKey }: OnlineClassNoticeProps) {
+export function OnlineClassNotice(_props: OnlineClassNoticeProps) {
   return (
-    <aside
-      aria-label="Aviso de clases online"
-      className={[
-        "mb-4 shrink-0 items-center gap-3 rounded-md border border-brand/15 bg-brand/5 px-3 py-2.5 sm:px-4",
-        selectedKey === ONLINE_CLASS_NOTICE.date ? "flex" : "hidden md:flex",
-      ].join(" ")}
-    >
-      <CloudRain aria-hidden="true" className="size-5 shrink-0 text-brand" strokeWidth={1.75} />
-
-      <div className="min-w-0 border-l border-brand/15 pl-3">
-        <p className="text-xs font-semibold leading-5 text-brand">{ONLINE_CLASS_NOTICE.title}</p>
-
-        <p className="text-xs leading-5 text-muted">{ONLINE_CLASS_NOTICE.message}</p>
-      </div>
-    </aside>
+    <details className={styles.notice}>
+      <summary>
+        <CloudRain aria-hidden="true" />
+        <span className="min-w-0 flex-1 font-medium">{ONLINE_CLASS_NOTICE.title}</span>
+        <span className="shrink-0 text-xs underline underline-offset-2">Ver detalle</span>
+      </summary>
+      <p className={styles.noticeDetail}>{ONLINE_CLASS_NOTICE.message}</p>
+    </details>
   );
 }
