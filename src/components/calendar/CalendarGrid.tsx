@@ -1,6 +1,7 @@
 import { Link2 } from "lucide-react";
 
 import { ActivityCard } from "@/components/calendar/ActivityCard";
+import { CalendarMilestone } from "@/components/calendar/CalendarMilestone";
 import {
   DAY_NAMES,
   dayColumnClass,
@@ -134,16 +135,25 @@ export function CalendarGrid({
                         ].join(" ")}
                         key={key}
                       >
-                        {holiday && (
-                          <p className={styles.milestone} title={`Feriado: ${holiday.name}`}>
-                            {holiday.name} · Sin actividades
-                          </p>
-                        )}
-                        {dates.map((item) => (
-                          <p className={styles.milestone} key={item.id} title={item.title}>
-                            {item.title}
-                          </p>
-                        ))}
+                        <CalendarMilestone
+                          dateLabel={fullDateFormatter.format(day)}
+                          items={[
+                            ...(holiday
+                              ? [
+                                  {
+                                    id: `holiday-${key}`,
+                                    title: holiday.name,
+                                    kind: "holiday" as const,
+                                  },
+                                ]
+                              : []),
+                            ...dates.map((item) => ({
+                              id: item.id,
+                              title: item.title,
+                              kind: "academic" as const,
+                            })),
+                          ]}
+                        />
                       </div>
                     );
                   })}
@@ -194,6 +204,18 @@ export function CalendarGrid({
                     ].join(" ")}
                     key={key}
                   >
+                    {longBreaks.map((gap) => (
+                      <div
+                        aria-hidden="true"
+                        className={styles.lunchBand}
+                        key={`break-${gap.startMinutes}`}
+                        style={{
+                          top: `${((gap.startMinutes - start) / duration) * 100}%`,
+                          height: `${((gap.endMinutes - gap.startMinutes) / duration) * 100}%`,
+                        }}
+                      />
+                    ))}
+
                     {marks.map((mark) => (
                       <div
                         aria-hidden="true"
